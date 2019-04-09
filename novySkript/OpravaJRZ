@@ -1,0 +1,30 @@
+// LANGUAGE="JavaScript"
+
+//Skript opravuje import osob z JRZ
+
+
+
+U subjektov z priloženého zoznamu (identifikované prostredníctvom JRŽ ID) prosím zmeniť kategóriu/druh adresy z adresy sídla právnickej osoby na adresu trvalého pobytu. (Zoznam môže obsahovať aj ID, ktoré ešte nie sú v systéme, keďže ide o údaje z exportu k 12.3.)v prílohe dokument k tomu trvalý pobyt SD 240/0074
+V prípade, že v adrese je vyplnené len jedno z polí súpisné číslo / orientačné číslo, poprosím toto číslo uviesť v poli Orientačné číslo. SD 240/0072
+U subjektov z priloženého zoznamu (identifikované prostredníctvom JRŽ ID) prosím vymazať údaje zo záložky fyzická osoba, ide o právnické osoby, ktoré by mali mať iba údaje v záložke právnická osoba. (Zoznam môže obsahovať aj ID, ktoré ešte nie sú v systéme, keďže ide o údaje z exportu k 12.3.)  k tomuto je súbor v prílohe SD 240/0075
+V položke korešpondenčná/kontaktná adresa prosím doplniť správne údaje o pošte (na základe PSČ). V súčasnosti je zaškrtnuté pole textová adresa a pošta nie je vyplnená správne. Zároveň poprosím skontrolovať aktuálnosť/správne fungovanie číselníkov ulíc (príklad: mesto Levoča nemá v systéme ulice). SD 240/0073
+
+
+
+var scriptName = "OpravaJRZ";
+
+try
+{
+coort.Trace(scriptName + "  START -->");
+
+
+
+var importCsvPath = "C:\\zoznamovmsaktivovanouschrankounadorucovanie_part.csv";
+
+
+}
+catch(e)
+{
+	coort.Trace(scriptName + " - ERROR : " + e.message);
+	throw e;
+}

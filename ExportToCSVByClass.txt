@@ -1,0 +1,27 @@
+// LANGUAGE="JScript"
+try
+{
+	var scriptName = "ExportToCSVByClass";
+	coort.Trace(scriptName+" START");
+
+	//var ExportClass = coort.GetObject("COO.103.510.1.800093"); //osoba
+	//var ExportClass = coort.GetObject("COO.103.510.1.800603"); //PostAddress
+	//var ExportClass = coort.GetObject("COO.103.510.1.800574"); //GeoAddress
+	var ExportClass = coort.GetObject("COO.103.510.1.800058"); //Ulica
+
+	var CSVPath = "D:\\Export\\";
+
+	var ExportAct = coort.GetObject("COO.103.510.1.4558594");
+	var ExportMeth = ExportAct.GetMethod(cootx, "SKCODELISTS@103.510:ActExportToCSVByClass");
+
+	ExportMeth.SetParameterValue(1, "COOSYSTEM@1.1:OBJECT", 0, ExportClass);
+	ExportMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRING", 0, CSVPath);
+	ExportAct.CallMethod(cootx, ExportMeth);
+
+	coort.Trace(scriptName+" END");
+}
+catch(e)
+{
+	coort.Trace(scriptName + " - ERROR : " + e.message);
+	throw e;
+}

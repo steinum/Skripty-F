@@ -1,0 +1,66 @@
+// LANGUAGE="JScript"
+//spocitanie objektov asynchronnym selectom
+try
+{
+	var scriptName = "CountObjs";
+	coort.Trace(scriptName + " START -->");
+	//---------------------CONFIGURABLES-------------------------------------------------------------
+	var query = "DOMAINS(COO.2061.100.1.1) SELECT objname FROM FSCFOLIO@1.1001:Person";
+	//var query = "SELECT objname FROM FSCFOLIO@1.1001:Person";
+	//var query = "SELECT objname FROM COOSYSTEM@1.1:Object WHERE .COOSYSTEM@1.1:objaddress = \"COO.2061.100.1.1027245\"";
+	//-------------------------------------------------------------------------------------
+	var itemsCnt=0;
+	
+	var dateNow = new Date();
+	var dd = dateNow.getDate();
+	var mm = (dateNow.getMonth()+1);
+	var hrs = dateNow.getHours();
+	var min = dateNow.getMinutes();
+	var sec = dateNow.getSeconds();
+	if(dd<10) {dd='0'+dd}
+	if(mm<10) {mm='0'+mm}
+	if(hrs<10) {hrs='0'+hrs}
+	if(min<10) {min='0'+min}
+	if(sec<10) {sec='0'+sec}
+	
+	var dateFormated = dateNow.getYear() +'_'+ mm +'_'+ dd +'-'+hrs+'_'+min+'_'+sec;
+	var logPath = "C:\\CountObjs_log_"+dateFormated+".txt";
+	
+	var fso = new ActiveXObject("Scripting.FileSystemObject");
+	var logFile = fso.CreateTextFile(logPath, true);
+	logFile.WriteLine("query: " + query);
+	
+	var queryRes = coort.SearchObjectsAsync(cootx, query);
+	
+	var searchFound = true;
+	var foundObjs = null;
+	var foundObj = null;
+	while (searchFound)
+	{
+		foundObjs = queryRes.GetObjects(2500);
+		if (foundObjs == null || foundObjs.length<1)
+		{
+			searchFound=false;
+			coort.Trace(scriptName + " - ziadne (dalsie) objekty");
+		}
+		else
+		{
+			foundObjs = foundObjs.toArray();
+			itemsCnt += foundObjs.length;
+			coort.Trace(scriptName + " - itemsCnt: "+ itemsCnt);//
+		}
+	}
+	logFile.WriteLine("pocet najdenych objektov: "+itemsCnt);
+	logFile.WriteLine("startTime: "+dateNow);
+	var dateNowEnd = new Date();
+	logFile.WriteLine("endTime: "+dateNowEnd);
+	logFile.Close();
+	coort.Trace(scriptName + " - pocet najdenych objektov: "+itemsCnt);
+	coort.Trace(scriptName + " - END <--");
+}
+catch(e)
+{
+	coort.Trace(scriptName + " - ERROR : " + e.message);
+	logFile.WriteLine("ERROR: " + e.message);
+	throw e;
+}
