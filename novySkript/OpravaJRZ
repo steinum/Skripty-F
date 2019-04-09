@@ -15,7 +15,24 @@ var scriptName = "OpravaJRZ";
 
 try
 {
+
 coort.Trace(scriptName + "  START -->");
+
+//---------------------CONFIGURABLES---------------------------
+var importCsvPath = "C:\\zoznamovmsaktivovanouschrankounadorucovanie_part.csv";
+var logDirPath = "C:\\";
+var doLogFile = true;
+
+
+//create log file
+if (doLogFile)
+{
+  var dateFormated = GetFormatedDate(startDate);
+  var logPath = logDirPath + scriptName + ".txt";
+  var fso = new ActiveXObject("Scripting.FileSystemObject");
+  var logFile = fso.CreateTextFile(logPath, true);
+  logFile.WriteLine("import: "+importCsvPath);
+}
 
 
 
