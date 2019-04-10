@@ -26,20 +26,23 @@ if (doLogFile)
 //nacitanie csv - read file
 var inFile = fso.OpenTextFile(inFile, 1);
 var lineNum = 0;
-while (!inFile.AtEndOfStream)
+while (!inFile.AtEndOfStream) // prvy riadok
 {
   lineNum++;
-  var fileLine = inFile.ReadLine();
+  var fileLine = inFile.ReadLine(); // nacitaj riadok
   try
   {
-    if ( !IsNullOrEmpty(fileLine))
+    if ( !IsNullOrEmpty(fileLine)) // ak riadok nie je prazdny
     {
-      var fileLineArr = fileLine.split(";");
-      if (fileLineArr.length>1)
+      var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
+      if (fileLineArr.length>1) // ak daka je
       {
 
         // trace toho co vypise
-        
+        coort.Trace("fileLine", fileLine);
+        coort.Trace("fileLineArr", fileLineArr);
+
+/*
         var identifier = fileLineArr[0];
         var duplicityObjsCoo = fileLineArr[1];
         var duplicityObjsCooArr = null;
@@ -69,6 +72,9 @@ while (!inFile.AtEndOfStream)
             }
           }
         }
+
+*/
+
       }
     }
   }
@@ -81,12 +87,12 @@ while (!inFile.AtEndOfStream)
       logFile.WriteLine("ERROR - chyba pri spracovani riadka "+lineNum+": " + e.message);
     }
   }
-  if (itemsCnt % commitAfter == 0)
-  {
-    TraceText("commit "+itemsCnt);
-    //cootx.Commit();
-    coouser.FSCVAPP_1_1001_CommitRoot(cootx);
-  }
+  // if (itemsCnt % commitAfter == 0) // ctrl+/
+  // {
+  //   TraceText("commit "+itemsCnt);
+  //   //cootx.Commit();
+  //   coouser.FSCVAPP_1_1001_CommitRoot(cootx);
+  // }
 }
 inFile.Close();
 
