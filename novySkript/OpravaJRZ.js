@@ -4,9 +4,15 @@
 var scriptName = "OpravaJRZ";
 
 //---------------------CONFIGURABLES---------------------------
-var inFile = "D:\\jrz\\CSV_od_Jakuba_COO_adresy_prvy_import_mapovanie_osoby_adresy.csv";
+var inFile = "D:\\jrz\\spajanie.csv"; // CSV_od_Jakuba_COO_adresy_prvy_import_mapovanie_osoby_adresy.csv
 var logDirPath = "D:\\jrz\\";
 var doLogFile = true;
+var doTrace = true;
+
+
+
+var povodnaOsoba;
+var selectOsoby;
 
 //----------------------Functions-----------------------------------------------------
 
@@ -22,6 +28,14 @@ function IsNullOrEmpty(inStr)
 	}
 }
 
+function SpracujOsobu(povodnaOsoba) {
+  if (povodnaOsoba != null) {
+     if (doTrace) coort.Trace(" povodnaOsoba: ", povodnaOsoba);
+
+     //selectOsoby =
+  }
+}
+
 
 //----------------------MAIN_CODE-----------------------------------------------------
 
@@ -29,7 +43,7 @@ function IsNullOrEmpty(inStr)
 try
 {
 
-coort.Trace(scriptName + "  START -->");
+if (doTrace) coort.Trace(scriptName + "  START -->");
 
 //create log file
 var logPath = logDirPath + scriptName + ".txt";
@@ -37,12 +51,12 @@ var fso = new ActiveXObject("Scripting.FileSystemObject");
 var logFile = null;
 if (doLogFile)
 {
-  coort.Trace("  >>> VYTVARAM LOGFILE  ");
+ if (doTrace) coort.Trace("  >>> VYTVARAM LOGFILE  ");
   logFile = fso.CreateTextFile(logPath, true);
 }
 
 //nacitanie csv - read file
-coort.Trace("  ::: otvaram csv subor   ", fso.FileExists(inFile));
+if (doTrace) coort.Trace("  ::: otvaram csv subor   ", fso.FileExists(inFile));
 if (fso.FileExists(inFile)) {
 var inFile = fso.OpenTextFile(inFile, 1);
 }
@@ -50,35 +64,47 @@ var inFile = fso.OpenTextFile(inFile, 1);
 var lineNum = 0;
 while (!inFile.AtEndOfStream) // prvy riadok
 {
-  coort.Trace("  AtEdnOfStream:  ", lineNum );
+  if (doTrace) coort.Trace("  AtEdnOfStream:  ", lineNum );
   lineNum++;
   var fileLine = inFile.ReadLine(); // nacitaj riadok
-  coort.Trace(" fileLine:  ", fileLine );
+  if (doTrace) coort.Trace(" fileLine:  ", fileLine );
 
   try
   {
-    coort.Trace(" try2  ");
+    if (doTrace) coort.Trace(" try2  ");
     if ( !IsNullOrEmpty(fileLine)) // ak riadok nie je prazdny
-    coort.Trace(" !IsNullOrEmpty(fileLine)  ", !IsNullOrEmpty(fileLine));
+    if (doTrace) coort.Trace(" !IsNullOrEmpty(fileLine)  ", !IsNullOrEmpty(fileLine));
     {
       var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
-      coort.Trace(" fileLineArr:  ", fileLineArr);
       if (fileLineArr.length>1) // ak daka je
       {
 
         // trace toho co vypise
-        coort.Trace("fileLine", fileLine);
-        coort.Trace("fileLineArr", fileLineArr);
-        coort.Trace("fileLineArr[0] entitiID", fileLineArr[0]);
-        coort.Trace("fileLineArr[1] osobaCoo", fileLineArr[1]);
-        coort.Trace("fileLineArr[2] DruhAdresy", fileLineArr[2]);
-        coort.Trace("fileLineArr[3] adresaCOO", fileLineArr[3]);
-
+      if (doTrace) coort.Trace("osobaCoo: " + fileLineArr[1]);
 
 
         if (doLogFile)
   			{
-  				logFile.WriteLine("fileLine: " + fileLine);
+          coort.Trace("1 ");
+          var poleDuplicit = [];
+          coort.Trace("2 ");
+          poleDuplicit.push(fileLineArr[1]);
+          coort.Trace("3 ");
+          poleDuplicit[lineNum] += (fileLineArr[1]) ;
+          coort.Trace("4 ");
+          coort.Trace("poleDuplicit: ", poleDuplicit[lineNum]);
+          coort.Trace("5 ");
+
+          var nic = fileLineArr[1];
+          coort.Trace("nic ", nic);
+          var hodnotaStavu = poleDuplicit.indexOf(nic);
+
+          coort.Trace("hodnotaStavu - ");
+          if(hodnotaStavu >= 0) {
+            coort.Trace("hodnotaStavu + ");
+            logFile.WriteLine("osobaCoo: " + fileLineArr[1]);
+          }
+
   			}
 
 /*
@@ -134,12 +160,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
   // }
 }
 inFile.Close();
-
-
-
-
-
-
+ coort.Trace(" END ");
 
 
 
