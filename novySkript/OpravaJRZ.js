@@ -9,6 +9,8 @@ var logDirPath = "D:\\jrz\\";
 var doLogFile = true;
 var doTrace = true;
 
+var stlpecImportu = 0;
+
 
 
 var povodnaOsoba;
@@ -80,30 +82,33 @@ while (!inFile.AtEndOfStream) // prvy riadok
       {
 
         // trace toho co vypise
-      if (doTrace) coort.Trace("osobaCoo: " + fileLineArr[1]);
+      if (doTrace) coort.Trace("osobaCoo: " + fileLineArr[stlpecImportu]);
 
 
         if (doLogFile)
   			{
-          coort.Trace("1 ");
-          var poleDuplicit = [];
-          coort.Trace("2 ");
-          poleDuplicit.push(fileLineArr[1]);
-          coort.Trace("3 ");
-          poleDuplicit[lineNum] += (fileLineArr[1]) ;
-          coort.Trace("4 ");
-          coort.Trace("poleDuplicit: ", poleDuplicit[lineNum]);
-          coort.Trace("5 ");
 
-          var nic = fileLineArr[1];
-          coort.Trace("nic ", nic);
-          var hodnotaStavu = poleDuplicit.indexOf(nic);
+            // kontrola duplicity
 
-          coort.Trace("hodnotaStavu - ");
-          if(hodnotaStavu >= 0) {
-            coort.Trace("hodnotaStavu + ");
-            logFile.WriteLine("osobaCoo: " + fileLineArr[1]);
-          }
+            // SELECT
+            objAdressa = fileLineArr[stlpecImportu];
+            var query = "SELECT COOSYSTEM@1.1:objname FROM COOSYSTEM@1.1:Object WHERE .COOSYSTEM@1.1:objaddress = \"" + objAdressa + "\"";
+            var osobaVyhladana = coort.SearchObjects3(cootx, query);
+            if (osobaVyhladana!=null)
+        		{
+
+               coort.Trace("osobaVyhladana: ", osobaVyhladana);
+               coort.Trace("osobaVyhladana: ", osobaVyhladana.COOSYSTEM_1_1_objname);              
+               //coort.Trace("osobaVyhladana: ", osobaVyhladana.SKCODELISTS_103_510_AttrAggrIdentifikatory.SKCODELISTS_103_510_AttrPtrCisSUSR4001);
+               //praca s osobou - pozretie identifikatora a vymazanie vlastnosti
+
+            }
+
+            if(lineNum != 1) {
+              logFile.WriteLine(fileLineArr[stlpecImportu]);
+            }
+
+
 
   			}
 
