@@ -10,7 +10,12 @@ var doLogFile = true;
 var doTrace = true;
 
 var stlpecImportu = 0;
-
+// pole pre duplicitu
+var ulozenaCooOsoby;
+var poleOsob = [];
+var bool;
+var vyhladajOsobu;
+var duplikatOsoba;
 
 
 var povodnaOsoba;
@@ -35,6 +40,16 @@ function SpracujOsobu(povodnaOsoba) {
      if (doTrace) coort.Trace(" povodnaOsoba: ", povodnaOsoba);
 
      //selectOsoby =
+  }
+}
+
+
+function DuplikatHodnoty(hodnota) {
+  bool = poleOsob.indexOf(hodnota)
+  if(bool == -1) {
+    vyhladajOsobu = true;
+  } else {
+    vyhladajOsobu = false;
   }
 }
 
@@ -83,12 +98,20 @@ while (!inFile.AtEndOfStream) // prvy riadok
 
         // trace toho co vypise
       if (doTrace) coort.Trace("osobaCoo: " + fileLineArr[stlpecImportu]);
-
+      ulozenaCooOsoby = fileLineArr[stlpecImportu];
+      if (doTrace) coort.Trace("ulozenaCooOsoby: ", ulozenaCooOsoby);
 
         if (doLogFile)
   			{
 
             // kontrola duplicity
+            poleOsob.push(ulozenaCooOsoby);
+            coort.Trace("poleOsob: ", poleOsob[lineNum-1]);
+            duplikatOsoba = poleOsob[lineNum-1];
+            coort.Trace("duplikatOsoba: ", duplikatOsoba);
+
+            DuplikatHodnoty(duplikatOsoba);
+
 
             // SELECT
             objAdressa = fileLineArr[stlpecImportu];
@@ -98,14 +121,21 @@ while (!inFile.AtEndOfStream) // prvy riadok
         		{
 
                coort.Trace("osobaVyhladana: ", osobaVyhladana);
-               coort.Trace("osobaVyhladana: ", osobaVyhladana.COOSYSTEM_1_1_objname);              
+               //coort.Trace("osobaVyhladana: ", osobaVyhladana.COOSYSTEM_1_1_objname);
+
+
+
                //coort.Trace("osobaVyhladana: ", osobaVyhladana.SKCODELISTS_103_510_AttrAggrIdentifikatory.SKCODELISTS_103_510_AttrPtrCisSUSR4001);
                //praca s osobou - pozretie identifikatora a vymazanie vlastnosti
 
             }
 
             if(lineNum != 1) {
-              logFile.WriteLine(fileLineArr[stlpecImportu]);
+              if(vyhladajOsobu) {
+                logFile.WriteLine(fileLineArr[stlpecImportu]);
+              } else {
+                coort.Trace(" - duplicita - ");
+              }
             }
 
 
