@@ -158,14 +158,51 @@ while (!inFile.AtEndOfStream) // prvy riadok
            			for (var iOsobaIDs = 0; iOsobaIDs<osobaIDsCnt; iOsobaIDs++)
            			{
 
-                  var typOsoby = osobaIDs[iOsobaIDs].SKCODELISTS_103_510_AttrPtrCisSUSR4001.SKCODELISTS_103_510_AttrStrCode;//.SKCODELISTS_103_510_AttrStrIdentifikatorPom; //SKCODELISTS_103_510_AttrPtrCisSUSR4001;
+                  var typOsoby = osobaIDs[iOsobaIDs].SKCODELISTS_103_510_AttrPtrCisSUSR4001.SKCODELISTS_103_510_AttrStrCode;
                   if(typOsoby != null) {
                     if(typOsoby == 7) {
                       coort.Trace("typ osoby PO ");
                       logFile.WriteLine(" PO");
+
+                      os.SKCODELISTS_103_510_AttrPtrCisSUSR0062;
+
+                      coort.Trace("Meno fo: ", os.SKCODELISTS_103_510_AttrStrOsobaMeno);
+                      coort.Trace("Plné meno právnickej osoby: ", os.SKCODELISTS_103_510_AttrStrPOPlneMeno);
+                      if(os.SKCODELISTS_103_510_AttrStrOsobaMeno != null) {
+                        os.SKCODELISTS_103_510_AttrStrOsobaMeno = null;
+                      }
+                      // os.ELISTS_103_510_AttrStrOsobaPriezvisko = null;
+                      // os.SKCODELISTS_103_510_AttrStrOsobaRodnePriezvisko = null;
+                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR0063 = null;
+                      // os.SKCODELISTS_103_510_AttrDateFONarodenieDatum = null;
+                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR3003 = null;
+                      // os.ODELISTS_103_510_AttrPtrCisSUSR4002 = null;
+                      // os.SKCODELISTS_103_510_AttrPtrSUSR0086 = null;
+                      // os.SKCODELISTS_103_510_AttrPtrNarodnost = null;
+                      // os.SKCODELISTS_103_510_AttrDateFOUmrtieDatum = null;
+                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR4003 = null;
+                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 = null;
+                      coort.Trace(" PO ok");
+
                     } else if (typOsoby == 9) {
                       coort.Trace("typ osoby FO ");
                       logFile.WriteLine(" FO");
+
+                      coort.Trace("Meno fo: ", os.SKCODELISTS_103_510_AttrStrOsobaMeno);
+                      coort.Trace("Plné meno právnickej osoby: ", os.SKCODELISTS_103_510_AttrStrPOPlneMeno);
+                      if(os.SKCODELISTS_103_510_AttrStrPOPlneMeno != null) {
+                        os.SKCODELISTS_103_510_AttrStrPOPlneMeno = null;
+                      }
+                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR0056 = null;
+                      // os.SKCODELISTS_103_510_AttrDatePOZalozenie = null;
+                      // os.SKCODELISTS_103_510_AttrDatePOZanik = null;
+                      // os.SKCODELISTS_103_510_AttrPtrPOPredmetCinnostiOKEC = null;
+                      // os.SKCODELISTS_103_510_AttrPtrPOVelkostOrganizacie = null;
+                      // os.SKCODELISTS_103_510_AttrPtrPOOrganizacnaJednotka = null;
+                      // os.SKCODELISTS_103_510_AttrPtrSuperiorPersons = null;
+                      // os.SKCODELISTS_103_510_AttrAggrContactPersons = null;
+                      coort.Trace("FO ok");
+
                     } else {
                       coort.Trace("typ osoby naznamy ");
                     }
