@@ -120,23 +120,65 @@ while (!inFile.AtEndOfStream) // prvy riadok
             // var stringPole += ulozenaCooOsoby;
             // coort.Trace("stringPole: ", stringPole);
 
-            //var f = poleOsob.indexOf(duplikatOsoba);
-
-
-
-            //DuplikatHodnoty(duplikatOsoba);
-            coort.Trace("DuplikatHodnoty za ", f);
 
 
             // SELECT
             objAdressa = fileLineArr[stlpecImportu];
             var query = "SELECT COOSYSTEM@1.1:objname FROM COOSYSTEM@1.1:Object WHERE .COOSYSTEM@1.1:objaddress = \"" + objAdressa + "\"";
-            var osobaVyhladana = coort.SearchObjects3(cootx, query);
-            if (osobaVyhladana!=null)
+            var osobaVyhladana = coort.SearchObjectsAsync(cootx, query); //SearchObjects3
+            var foundObjs = null;
+            foundObjs = osobaVyhladana.GetObjects(5);
+
+            if (foundObjs == null || foundObjs.length<1) {
+        			coort.Trace(scriptName + " - ziadne (dalsie) objekty na spracovanie");
+        		}
+        		else
         		{
+              foundObjs = foundObjs.toArray();
+              var os = foundObjs[0];
 
                coort.Trace("osobaVyhladana: ", osobaVyhladana);
-               //coort.Trace("osobaVyhladana: ", osobaVyhladana.COOSYSTEM_1_1_objname);
+               //var meno = GetAttributeString(cootx, "CONTACTEXT@15.1001:mlname");
+               var meno = os.COOSYSTEM_1_1_objname;
+
+               coort.Trace("vlastnost: ", meno);
+
+
+               var g = os.SKCODELISTS_103_510_AttrStrPOPlneMeno;
+               var m = os.SKCODELISTS_103_510_AttrStrOsobaMeno;
+
+               coort.Trace("nazovPO xxx: ", g);
+               coort.Trace("nazovFO xxx: ", m);
+
+               var osobaIDs = os.SKCODELISTS_103_510_AttrAggrIdentifikatory;
+               if (osobaIDs!=null) {
+                var osobaIDsCnt = 0;
+           			osobaIDs = osobaIDs.toArray();
+           			osobaIDsCnt = osobaIDs.length;
+           			for (var iOsobaIDs = 0; iOsobaIDs<osobaIDsCnt; iOsobaIDs++)
+           			{
+
+                  var typOsoby = osobaIDs[iOsobaIDs].SKCODELISTS_103_510_AttrPtrCisSUSR4001.SKCODELISTS_103_510_AttrStrCode;//.SKCODELISTS_103_510_AttrStrIdentifikatorPom; //SKCODELISTS_103_510_AttrPtrCisSUSR4001;
+                  if(typOsoby != null) {
+                    if(typOsoby == 7) {
+                      coort.Trace("typ osoby PO ");
+                      logFile.WriteLine(" PO");
+                    } else if (typOsoby == 9) {
+                      coort.Trace("typ osoby FO ");
+                      logFile.WriteLine(" FO");
+                    } else {
+                      coort.Trace("typ osoby naznamy ");
+                    }
+
+                  } else {
+                    coort.Trace(" typ osoby je null ");
+                  }
+
+           			}
+           		 }
+
+
+
 
 
 
@@ -146,11 +188,9 @@ while (!inFile.AtEndOfStream) // prvy riadok
             }
 
             if(lineNum != 1) {
-              if(vyhladajOsobu) {
+
                 logFile.WriteLine(fileLineArr[stlpecImportu]);
-              } else {
-                coort.Trace(" - duplicita - ");
-              }
+
             }
 
 
