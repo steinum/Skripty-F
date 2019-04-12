@@ -16,6 +16,7 @@ var poleOsob = [];
 var bool;
 var vyhladajOsobu;
 var duplikatOsoba;
+var hodnota; // ddddd
 
 
 var povodnaOsoba;
@@ -44,14 +45,21 @@ function SpracujOsobu(povodnaOsoba) {
 }
 
 
-function DuplikatHodnoty(hodnota) {
-  bool = poleOsob.indexOf(hodnota)
-  if(bool == -1) {
-    vyhladajOsobu = true;
-  } else {
-    vyhladajOsobu = false;
-  }
-}
+// function DuplikatHodnoty(hodnota) {
+//   coort.Trace(" DuplikatHodnoty - funkcia ", hodnota);
+//
+//   coort.Trace("poleOsob length ", poleOsob.length);
+//   var bla = 'a nice string'.indexOf('nice') !== -1
+//   coort.Trace(" bla: ", bla);
+//   //bool = poleOsob.includes(hodnota);
+//   //bool = poleOsob.indexOf(hodnota);
+//   if(bool == -1) {
+//     vyhladajOsobu = true;
+//   } else {
+//     vyhladajOsobu = false;
+//   }
+//   coort.Trace(" duplikat hodnoty funkcia - vysledok: ", vyhladajOsobu);
+// }
 
 
 //----------------------MAIN_CODE-----------------------------------------------------
@@ -105,12 +113,19 @@ while (!inFile.AtEndOfStream) // prvy riadok
   			{
 
             // kontrola duplicity
-            poleOsob.push(ulozenaCooOsoby);
-            coort.Trace("poleOsob: ", poleOsob[lineNum-1]);
-            duplikatOsoba = poleOsob[lineNum-1];
-            coort.Trace("duplikatOsoba: ", duplikatOsoba);
+            // poleOsob.push(ulozenaCooOsoby);
+            //coort.Trace("poleOsob: ", poleOsob[lineNum-1]);
+            // duplikatOsoba = poleOsob[lineNum-1];
+            // coort.Trace("duplikatOsoba: ", duplikatOsoba);
+            // var stringPole += ulozenaCooOsoby;
+            // coort.Trace("stringPole: ", stringPole);
 
-            DuplikatHodnoty(duplikatOsoba);
+            //var f = poleOsob.indexOf(duplikatOsoba);
+
+
+
+            //DuplikatHodnoty(duplikatOsoba);
+            coort.Trace("DuplikatHodnoty za ", f);
 
 
             // SELECT
