@@ -113,6 +113,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
   			{
 
             // kontrola duplicity
+
             // poleOsob.push(ulozenaCooOsoby);
             //coort.Trace("poleOsob: ", poleOsob[lineNum-1]);
             // duplikatOsoba = poleOsob[lineNum-1];
@@ -154,6 +155,14 @@ while (!inFile.AtEndOfStream) // prvy riadok
                if (osobaIDs!=null) {
                 var osobaIDsCnt = 0;
            			osobaIDs = osobaIDs.toArray();
+
+								//zmazanie ID z druheho riadku
+								coort.Trace("osobaIDs: ", osobaIDs);
+								if(osobaIDs[1] != null) {
+									coort.Trace("_____v if ", osobaIDs[1]);
+									osobaIDs = null;
+								}
+
            			osobaIDsCnt = osobaIDs.length;
            			for (var iOsobaIDs = 0; iOsobaIDs<osobaIDsCnt; iOsobaIDs++)
            			{
@@ -171,17 +180,40 @@ while (!inFile.AtEndOfStream) // prvy riadok
                       if(os.SKCODELISTS_103_510_AttrStrOsobaMeno != null) {
                         os.SKCODELISTS_103_510_AttrStrOsobaMeno = null;
                       }
-                      // os.ELISTS_103_510_AttrStrOsobaPriezvisko = null;
-                      // os.SKCODELISTS_103_510_AttrStrOsobaRodnePriezvisko = null;
-                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR0063 = null;
-                      // os.SKCODELISTS_103_510_AttrDateFONarodenieDatum = null;
-                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR3003 = null;
-                      // os.ODELISTS_103_510_AttrPtrCisSUSR4002 = null;
-                      // os.SKCODELISTS_103_510_AttrPtrSUSR0086 = null;
-                      // os.SKCODELISTS_103_510_AttrPtrNarodnost = null;
-                      // os.SKCODELISTS_103_510_AttrDateFOUmrtieDatum = null;
-                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR4003 = null;
-                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 = null;
+                      if(os.ELISTS_103_510_AttrStrOsobaPriezvisko != null) {
+                        os.ELISTS_103_510_AttrStrOsobaPriezvisko = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrStrOsobaRodnePriezvisko != null) {
+                        os.SKCODELISTS_103_510_AttrStrOsobaRodnePriezvisko = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrCisSUSR0063 != null) {
+                        os.SKCODELISTS_103_510_AttrPtrCisSUSR0063 = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrDateFONarodenieDatum != null) {
+                        os.SKCODELISTS_103_510_AttrDateFONarodenieDatum = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrCisSUSR3003 != null) {
+                        os.SKCODELISTS_103_510_AttrPtrCisSUSR3003 = null;
+                      }
+                      if(os.ODELISTS_103_510_AttrPtrCisSUSR4002 != null) {
+                        os.ODELISTS_103_510_AttrPtrCisSUSR4002 = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrSUSR0086 != null) {
+                        os.SKCODELISTS_103_510_AttrPtrSUSR0086 = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrNarodnost != null) {
+                        os.SKCODELISTS_103_510_AttrPtrNarodnost = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrDateFOUmrtieDatum != null) {
+                        os.SKCODELISTS_103_510_AttrDateFOUmrtieDatum = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrCisSUSR4003 != null) {
+                        os.SKCODELISTS_103_510_AttrPtrCisSUSR4003 = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 != null) {
+                        os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 = null;
+                      }
+
                       coort.Trace(" PO ok");
 
                     } else if (typOsoby == 9) {
@@ -193,14 +225,31 @@ while (!inFile.AtEndOfStream) // prvy riadok
                       if(os.SKCODELISTS_103_510_AttrStrPOPlneMeno != null) {
                         os.SKCODELISTS_103_510_AttrStrPOPlneMeno = null;
                       }
-                      // os.SKCODELISTS_103_510_AttrPtrCisSUSR0056 = null;
-                      // os.SKCODELISTS_103_510_AttrDatePOZalozenie = null;
-                      // os.SKCODELISTS_103_510_AttrDatePOZanik = null;
-                      // os.SKCODELISTS_103_510_AttrPtrPOPredmetCinnostiOKEC = null;
-                      // os.SKCODELISTS_103_510_AttrPtrPOVelkostOrganizacie = null;
-                      // os.SKCODELISTS_103_510_AttrPtrPOOrganizacnaJednotka = null;
-                      // os.SKCODELISTS_103_510_AttrPtrSuperiorPersons = null;
-                      // os.SKCODELISTS_103_510_AttrAggrContactPersons = null;
+                      if(os.SKCODELISTS_103_510_AttrPtrCisSUSR0056 != null) {
+                        os.SKCODELISTS_103_510_AttrPtrCisSUSR0056 = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrDatePOZalozenie != null) {
+                        os.SKCODELISTS_103_510_AttrDatePOZalozenie = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrDatePOZanik != null) {
+                        os.SKCODELISTS_103_510_AttrDatePOZanik = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrPOPredmetCinnostiOKEC != null) {
+                        os.SKCODELISTS_103_510_AttrPtrPOPredmetCinnostiOKEC = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrPOVelkostOrganizacie != null) {
+                        os.SKCODELISTS_103_510_AttrPtrPOVelkostOrganizacie = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrPOOrganizacnaJednotka != null) {
+                        os.SKCODELISTS_103_510_AttrPtrPOOrganizacnaJednotka = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrPtrSuperiorPersons != null) {
+                        os.SKCODELISTS_103_510_AttrPtrSuperiorPersons = null;
+                      }
+                      if(os.SKCODELISTS_103_510_AttrAggrContactPersons != null) {
+                        os.SKCODELISTS_103_510_AttrAggrContactPersons = null;
+                      }
+
                       coort.Trace("FO ok");
 
                     } else {
