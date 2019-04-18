@@ -102,7 +102,12 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				TraceText("statSusr_CL000086: " + fileLineArr[23]);
 
 
+
 				var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
+
+				TraceText(" druh adresy ", druhAdersySusr_CL010139);
+				if(druhAdersySusr_CL010139 == "200001") {
+				  TraceText(" druh adresy 200001");
 
 				//ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
 				var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddress");
@@ -113,26 +118,6 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
 				adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, pOBOX);
 				adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, psc);
-
-				//najdi postu
-				if(okresSusr_0048 != null)
-				{
-					TraceText("okresSusr_0048 != null");
-
-				  var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassCodeListItem WHERE .SKCODELISTS@103.510:AttrStrCodeListNumber = '0048' AND .SKCODELISTS@103.510:AttrStrCode = " + okresSusr_0048;
-				  var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
-				  searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
-				  objclass.CallMethod(cootx, searchmeth);
-				  var objlist = searchmeth.GetParameter3(2);
-				  if(objlist != null)
-				  {
-				    objlist = objlist.toArray();
-				    if(objlist.length > 0)
-				    {
-				      adresaMeth.SetParameterValue(8, "COOSYSTEM@1.1:STRING", 0, objlist[0].GetName());
-				    }
-				  }
-				}
 
 				//najdi a nastav stat
 				if(statSusr_CL000086 != null)
@@ -161,7 +146,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				  typAdresy = 10;
 				}
 				adresaMeth.SetParameterValue(11, "SKCODELISTS@103.510@1.1:TypeEnumTargetType", 0, typAdresy);
-				adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); 666
+				//adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); //666
 
 
 
@@ -171,6 +156,62 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				//precitaj vystup metody (objekt)
 				var adresa = adresaMeth.GetParameterValue(1);
 				TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
+
+			} else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+				TraceText(" druh adresy 100001");
+
+				//ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
+				var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddressGEO");
+
+				adresaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRING", 0, ulica);
+				adresaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRING", 0, supisneCislo);
+				adresaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
+				adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, psc);
+				adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, obec);
+				if(okresSusr_0048 != null) {
+				adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, okresSusr_0048);
+			 	}
+
+				//najdi a nastav stat
+				if(statSusr_CL000086 != null)
+				{
+				  var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassRegItemStat WHERE .SKCODELISTS@103.510:AttrStrCode = " + statSusr_CL000086;
+				  var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
+				  searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
+				  objclass.CallMethod(cootx, searchmeth);
+				  var objlist = searchmeth.GetParameter3(2);
+				  if(objlist != null)
+				  {
+				    objlist = objlist.toArray();
+				    if(objlist.length > 0)
+				    {
+				      adresaMeth.SetParameterValue(10, "COOSYSTEM@1.1:OBJECT", 0, objlist[0]);
+				    }
+				  }
+				}
+
+				//typ adresy
+				var typAdresy;
+				if (ulica == '' && pOBOX != '')
+				{
+				  typAdresy = 20;
+				} else {
+				  typAdresy = 10;
+				}
+				//adresaMeth.SetParameterValue(11, "SKCODELISTS@103.510@1.1:TypeEnumTargetType", 0, typAdresy);
+				//adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); //666
+
+
+
+				//zavolaj metodu kontroly/pridania adresy
+				objclass.CallMethod(cootx, adresaMeth);
+
+				//precitaj vystup metody (objekt)
+				var adresaGeo = adresaMeth.GetParameterValue(1);
+				TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
+
+
+			}
 
 
 				//ActCheckAndAddOsoba
@@ -217,12 +258,16 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				osobaMeth.SetParameterValue(9, "COOSYSTEM@1.1:STRING", 0, NazovPO);
 				osobaMeth.SetParameterValue(11, "COOSYSTEM@1.1:STRING", 0, email);
 
+				if(druhAdersySusr_CL010139 == "200001") {
 				osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresa); // ADRESA 666
-
+			} else {
+				osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo); // ADRESA 666
+			}
 
 
 				osobaMeth.SetParameterValue(14, "COOSYSTEM@1.1:DATETIME", 0, DatumNarodenia);
-				osobaMeth.SetParameterValue(17, "COOSYSTEM@1.1:OBJECT", 0, coort.GetObject("COO.2295.100.2.88546"));
+				//osobaMeth.SetParameterValue(17, "COOSYSTEM@1.1:OBJECT", 0, druhAdersySusr_CL010139); //
+				osobaMeth.SetParameterValue(18, "COOSYSTEM@1.1:BOOLEAN", 0, true);
 
 
 
@@ -309,12 +354,12 @@ while (!inFile.AtEndOfStream) // prvy riadok
 								              if(os.SKCODELISTS_103_510_AttrAggrContactPersons != null) {
 								                os.SKCODELISTS_103_510_AttrAggrContactPersons = null;
 								              }
-															TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-															if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-																TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-																os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-																TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-								              }
+															// TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+															// if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
+															// 	TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+															// 	os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
+															// 	TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+								              // }
 
 
 								              TraceText("FO ok");
@@ -433,12 +478,12 @@ while (!inFile.AtEndOfStream) // prvy riadok
 														TraceText("vymaz adresu ");
 						                os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 = null;
 						              }
-													TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-													if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-														TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-														os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-														TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-													}
+													// TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+													// if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
+													// 	TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+													// 	os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
+													// 	TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+													// }
 
 						              TraceText(" PO ok");
 
