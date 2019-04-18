@@ -4,10 +4,13 @@
 var scriptName = "OpravaJRZ";
 
 //---------------------CONFIGURABLES---------------------------
-var inFile = "D:\\jrz\\import_test.csv"; // spajanie.csv  ...  CSV_od_Jakuba_COO_adresy_prvy_import_mapovanie_osoby_adresy.csv
-var logDirPath = "D:\\jrz\\";
+var inFile = "C:\\Program Files\\Import\\Import_adresy_TESTPPA.csv"; // ___ D:\\jrz\\import_test.csv
+var logDirPath = "C:\\Program Files\\Import\\"; //D:\\jrz\\
 var doLogFile = true;
 var doTrace = true;
+
+var adresa;
+var adresaGeo;
 
 var coouser = coort.GetCurrentUser();
 //----------------------Functions-----------------------------------------------------
@@ -160,7 +163,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				objclass.CallMethod(cootx, adresaMeth);
 
 				//precitaj vystup metody (objekt)
-				var adresa = adresaMeth.GetParameterValue(1);
+				adresa = adresaMeth.GetParameterValue(1);
 				TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
 
 			} else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -213,7 +216,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				objclass.CallMethod(cootx, adresaMeth);
 
 				//precitaj vystup metody (objekt)
-				var adresaGeo = adresaMeth.GetParameterValue(1);
+				adresaGeo = adresaMeth.GetParameterValue(1);
 				TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
 
 
@@ -248,11 +251,14 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				if (ICO != "") { TypIdentifikatoru = "7"; }
 				if (RodneCislo != "") { TypIdentifikatoru = "9"; }
 
+				TraceText("_ident_ ");
+
 				var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
 
 				//ICO alebo RC|TypIdentifikatoru|Titul|Meno|Priezvisko|Firma|Email|Adresa|DatumNarodenia|TypAdresy
 				var osobaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddOsoba");
 
+				TraceText("_set parametrov_ ");
 				osobaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRINGLIST", 0, Identifikator);
 				osobaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRINGLIST", 0, TypIdentifikatoru);
 				osobaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, titulPredMenom);
@@ -260,19 +266,35 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				osobaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, priezvisko);
 				osobaMeth.SetParameterValue(9, "COOSYSTEM@1.1:STRING", 0, NazovPO);
 				osobaMeth.SetParameterValue(11, "COOSYSTEM@1.1:STRING", 0, email);
+				TraceText("_set parametrov koniec_ ");
 
-				if(druhAdersySusr_CL010139 == "200001") {
-				osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresa); // ADRESA 666
+			TraceText("::::::::::druhAdersySusr_CL010139: ", druhAdersySusr_CL010139);
+			if(druhAdersySusr_CL010139 == "200001") {
+				TraceText("200001 v if ");
+				if(adresa != "") {
+					TraceText("adresa: ", adresa);
+					osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresa); // ADRESA 666
+				} else {
+					TraceText("adresa je null");
+				}
+
 			} else {
-				osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo); // ADRESA 666
+				TraceText("100001 v if ");
+				if(adresaGeo != "") {
+					TraceText("adresaGeo: ", adresaGeo);
+					osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo); // ADRESA 666
+				} else {
+					TraceText("adresaGeo je null");
+				}
 			}
 
-
+				TraceText("datum narodenia ");
 				osobaMeth.SetParameterValue(14, "COOSYSTEM@1.1:DATETIME", 0, DatumNarodenia);
 				//osobaMeth.SetParameterValue(17, "COOSYSTEM@1.1:OBJECT", 0, druhAdersySusr_CL010139); //
+				TraceText("boolean true ");
 				osobaMeth.SetParameterValue(18, "COOSYSTEM@1.1:BOOLEAN", 0, true);
 
-
+				TraceText("_set parametrov koniec2_ ");
 
 				// najdenie osoby podla identifikatora a vymaze data + adresu
 
@@ -311,12 +333,12 @@ while (!inFile.AtEndOfStream) // prvy riadok
 								        var osobaIDsCnt = 0;
 								   			osobaIDs = osobaIDs.toArray();
 
-												//zmazanie ID z druheho riadku
-												TraceText("osobaIDs: ", osobaIDs);
-												if(osobaIDs[1] != null) {
-													TraceText("_____v if ", osobaIDs[1]);
-													osobaIDs = null;
-												}
+												//zmazanie ID z druheho riadku 666
+												// TraceText("osobaIDs: ", osobaIDs);
+												// if(osobaIDs[1] != null) {
+												// 	TraceText("_____v if ", osobaIDs[1]);
+												// 	osobaIDs = null;
+												// }
 
 								   			osobaIDsCnt = osobaIDs.length;
 								   			for (var iOsobaIDs = 0; iOsobaIDs<osobaIDsCnt; iOsobaIDs++)
@@ -357,12 +379,12 @@ while (!inFile.AtEndOfStream) // prvy riadok
 								              if(os.SKCODELISTS_103_510_AttrAggrContactPersons != null) {
 								                os.SKCODELISTS_103_510_AttrAggrContactPersons = null;
 								              }
-															// TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-															// if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-															// 	TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-															// 	os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-															// 	TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-								              // }
+															TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+															if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
+																TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+																os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
+																TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+								              }
 
 
 								              TraceText("FO ok");
@@ -481,12 +503,12 @@ while (!inFile.AtEndOfStream) // prvy riadok
 														TraceText("vymaz adresu ");
 						                os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 = null;
 						              }
-													// TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-													// if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-													// 	TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-													// 	os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-													// 	TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-													// }
+													TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+													if(os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
+														TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+														os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
+														TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+													}
 
 						              TraceText(" PO ok");
 
