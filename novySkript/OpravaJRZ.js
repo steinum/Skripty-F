@@ -9,6 +9,7 @@ var logDirPath = "D:\\jrz\\";
 var doLogFile = true;
 var doTrace = true;
 
+var coouser = coort.GetCurrentUser();
 //----------------------Functions-----------------------------------------------------
 
 // vracia boolean hodnotu podla toho ci je hodnota poslana do parametru null
@@ -48,16 +49,21 @@ if (doLogFile)
 }
 
 //nacitanie csv - read file
-TraceText("  ::: otvaram csv subor  ", fso.FileExists(inFile));
+TraceText("  ::: otvaram csv subor na import ", fso.FileExists(inFile));
   if (fso.FileExists(inFile)) {
   var inFile = fso.OpenTextFile(inFile, 1);
 }
 
+TraceText("  nacitavam data... ");
+
 var lineNum = 0;
+
 while (!inFile.AtEndOfStream) // prvy riadok
 {
   TraceText("  AtEdnOfStream:  ", lineNum );
   lineNum++;
+	var commitovanie = lineNum;
+
   var fileLine = inFile.ReadLine(); // nacitaj riadok
   TraceText(" fileLine:  ", fileLine );
 
@@ -213,10 +219,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
 
 			}
 
-
 				//ActCheckAndAddOsoba
-
-
 				var ICO = fileLineArr[0];
 					TraceText("ICO: " + ICO);
 				var NazovPO = fileLineArr[1];
@@ -326,7 +329,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
 								              logFile.WriteLine(" FO");
 
 								              TraceText("Meno fo: ", os.SKCODELISTS_103_510_AttrStrOsobaMeno);
-								              TraceText("Plné meno právnickej osoby: ", os.SKCODELISTS_103_510_AttrStrPOPlneMeno);
+								              TraceText("Plne meno pravnickej osoby: ", os.SKCODELISTS_103_510_AttrStrPOPlneMeno);
 								              if(os.SKCODELISTS_103_510_AttrStrPOPlneMeno != null) {
 								                os.SKCODELISTS_103_510_AttrStrPOPlneMeno = null;
 								              }
@@ -504,12 +507,6 @@ while (!inFile.AtEndOfStream) // prvy riadok
 					}
 				}
 
-
-
-
-
-
-
 				//zavolaj metodu kontroly/pridania osoby
 				objclass.CallMethod(cootx, osobaMeth);
 
@@ -522,7 +519,13 @@ while (!inFile.AtEndOfStream) // prvy riadok
 
             if(lineNum != 1) {
 
-                logFile.WriteLine(fileLineArr[6]);
+							if(fileLineArr[6] == "") {
+								logFile.WriteLine(fileLineArr[1]);
+							} else {
+								logFile.WriteLine(fileLineArr[6]);
+							}
+              logFile.WriteLine(osoba.GetAddress()); // 666
+
 
             }
 
@@ -530,6 +533,9 @@ while (!inFile.AtEndOfStream) // prvy riadok
       }
     }
   }
+
+
+
   catch (e)
   {
     //error processing line
@@ -539,9 +545,17 @@ while (!inFile.AtEndOfStream) // prvy riadok
       logFile.WriteLine("ERROR - chyba pri spracovani riadka "+lineNum+": " + e.message);
     }
   }
+
+ if(commitovanie > 50) {
+	 coouser.FSCVAPP_1_1001_CommitRoot(cootx);
+	 TraceText(" -COMMIT- ");
+	 commitovanie = 0;
+ }
+
+
 }
 inFile.Close();
- TraceText(" END ");
+ TraceText(" END - koniec skriptu ");
 
 
 
