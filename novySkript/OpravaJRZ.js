@@ -16,232 +16,138 @@ var coouser = coort.GetCurrentUser();
 //----------------------Functions-----------------------------------------------------
 
 // vracia boolean hodnotu podla toho ci je hodnota poslana do parametru null
-function IsNullOrEmpty(inStr)
-{
-	if (inStr==null || inStr=="")
-	{
+function IsNullOrEmpty(inStr) {
+	if (inStr==null || inStr=="") {
 		return true;
-	}
-	else
-	{
+	} else {
 		return false;
 	}
 }
 
 // trace vypis
-function TraceText(traceStr)
-{
+function TraceText(traceStr) {
   if (doTrace)
     coort.Trace(scriptName + " - " + traceStr);
 }
 
-//----------------------MAIN_CODE-----------------------------------------------------
+// adresa
+function adresaInit() {
+	//ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
+	var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddress");
 
-try
-{
-TraceText(scriptName + "  START -->");
+	adresaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRING", 0, ulica);
+	adresaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRING", 0, obec);
+	adresaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, supisneCislo);
+	adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
+	adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, pOBOX);
+	adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, psc);
 
-//create log file
-var logPath = logDirPath + scriptName + ".txt";
-var fso = new ActiveXObject("Scripting.FileSystemObject");
-var logFile = null;
-if (doLogFile)
-{
-	TraceText("  >>> VYTVARAM LOGFILE  ");
-  logFile = fso.CreateTextFile(logPath, true);
-}
-
-//nacitanie csv - read file
-TraceText("  ::: otvaram csv subor na import ", fso.FileExists(inFile));
-  if (fso.FileExists(inFile)) {
-  var inFile = fso.OpenTextFile(inFile, 1);
-}
-
-TraceText("  nacitavam data... ");
-
-var lineNum = 0;
-
-while (!inFile.AtEndOfStream) // prvy riadok
-{
-  TraceText("  AtEdnOfStream:  ", lineNum );
-  lineNum++;
-	var commitovanie = lineNum;
-
-  var fileLine = inFile.ReadLine(); // nacitaj riadok
-  TraceText(" fileLine:  ", fileLine );
-
-  try
-  {
-    TraceText(" try2  ");
-    if ( !IsNullOrEmpty(fileLine)) // ak riadok nie je prazdny
-    TraceText(" !IsNullOrEmpty(fileLine)  ", !IsNullOrEmpty(fileLine));
-    {
-      var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
-      if (fileLineArr.length>1) // ak daka je
-      {
-
-      // trace toho co vypise
-      TraceText("ICO: " + fileLineArr[0]);
-			TraceText("Osoba PO nazov: " + fileLineArr[1]);
-			TraceText("RC: " + fileLineArr[3]);
-			TraceText("meno: " + fileLineArr[5]);
-			TraceText("priezvysko: " + fileLineArr[6]);
-			TraceText("datum narodenia: " + fileLineArr[8]);
-		 var jrzId = fileLineArr[14];
-			TraceText("jrzId: " + fileLineArr[14]);
-
-				TraceText(":::::::::::::: ");
-			var ulica = fileLineArr[16];
-				TraceText("ulica: " + ulica);
-			var obec = fileLineArr[21];
-				TraceText("obec: " + obec);
-			var supisneCislo = fileLineArr[17];
-				TraceText("supisneCislo: " + supisneCislo);
-			var orientacneCislo = fileLineArr[18];
-				TraceText("orientacneCislo: " + orientacneCislo);
-			var pOBOX = fileLineArr[20];
-				TraceText("pOBOX: " + pOBOX);
-			var psc = fileLineArr[19];
-				TraceText("psc: " + psc);
-			var druhAdersySusr_CL010139 = fileLineArr[15];
-				TraceText("druhAdersySusr_CL010139: " + druhAdersySusr_CL010139);
-			var okresSusr_0048 = fileLineArr[22];
-				TraceText("okresSusr_0048: " + fileLineArr[22]);
-			var statSusr_CL000086 = fileLineArr[23];
-				TraceText("statSusr_CL000086: " + fileLineArr[23]);
-
-
-
-				var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
-
-				TraceText(" druh adresy ", druhAdersySusr_CL010139);
-				if(druhAdersySusr_CL010139 == "200001") {
-				  TraceText(" druh adresy 200001");
-
-				//ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
-				var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddress");
-
-				adresaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRING", 0, ulica);
-				adresaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRING", 0, obec);
-				adresaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, supisneCislo);
-				adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
-				adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, pOBOX);
-				adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, psc);
-
-				//najdi a nastav stat
-				if(statSusr_CL000086 != null)
-				{
-				  var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassRegItemStat WHERE .SKCODELISTS@103.510:AttrStrCode = " + statSusr_CL000086;
-				  var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
-				  searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
-				  objclass.CallMethod(cootx, searchmeth);
-				  var objlist = searchmeth.GetParameter3(2);
-				  if(objlist != null)
-				  {
-				    objlist = objlist.toArray();
-				    if(objlist.length > 0)
-				    {
-				      adresaMeth.SetParameterValue(10, "COOSYSTEM@1.1:OBJECT", 0, objlist[0]);
-				    }
-				  }
-				}
-
-				//typ adresy
-				var typAdresy;
-				if (ulica == '' && pOBOX != '')
-				{
-				  typAdresy = 20;
-				} else {
-				  typAdresy = 10;
-				}
-				adresaMeth.SetParameterValue(11, "SKCODELISTS@103.510@1.1:TypeEnumTargetType", 0, typAdresy);
-				//adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); //666
-
-
-
-				//zavolaj metodu kontroly/pridania adresy
-				objclass.CallMethod(cootx, adresaMeth);
-
-				//precitaj vystup metody (objekt)
-				adresa = adresaMeth.GetParameterValue(1);
-				TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
-
-			} else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-				TraceText(" druh adresy 100001");
-
-				//ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
-				var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddressGEO");
-
-				adresaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRING", 0, ulica);
-				adresaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRING", 0, supisneCislo);
-				adresaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
-				adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, psc);
-				adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, obec);
-				if(okresSusr_0048 != null) {
-				adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, okresSusr_0048);
-			 	}
-
-				//najdi a nastav stat
-				if(statSusr_CL000086 != null)
-				{
-				  var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassRegItemStat WHERE .SKCODELISTS@103.510:AttrStrCode = " + statSusr_CL000086;
-				  var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
-				  searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
-				  objclass.CallMethod(cootx, searchmeth);
-				  var objlist = searchmeth.GetParameter3(2);
-				  if(objlist != null)
-				  {
-				    objlist = objlist.toArray();
-				    if(objlist.length > 0)
-				    {
-				      adresaMeth.SetParameterValue(10, "COOSYSTEM@1.1:OBJECT", 0, objlist[0]);
-				    }
-				  }
-				}
-
-				//typ adresy
-				var typAdresy;
-				if (ulica == '' && pOBOX != '')
-				{
-				  typAdresy = 20;
-				} else {
-				  typAdresy = 10;
-				}
-				//adresaMeth.SetParameterValue(11, "SKCODELISTS@103.510@1.1:TypeEnumTargetType", 0, typAdresy);
-				//adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); //666
-
-
-
-				//zavolaj metodu kontroly/pridania adresy
-				objclass.CallMethod(cootx, adresaMeth);
-
-				//precitaj vystup metody (objekt)
-				adresaGeo = adresaMeth.GetParameterValue(1);
-				TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
-
-
+	//najdi a nastav stat
+	if(statSusr_CL000086 != null) {
+		var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassRegItemStat WHERE .SKCODELISTS@103.510:AttrStrCode = " + statSusr_CL000086;
+		var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
+		searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
+		objclass.CallMethod(cootx, searchmeth);
+		var objlist = searchmeth.GetParameter3(2);
+		if(objlist != null) {
+			objlist = objlist.toArray();
+			if(objlist.length > 0) {
+				adresaMeth.SetParameterValue(10, "COOSYSTEM@1.1:OBJECT", 0, objlist[0]);
 			}
+		}
+	}
 
-				//ActCheckAndAddOsoba
-				var ICO = fileLineArr[0];
-					TraceText("ICO: " + ICO);
-				var NazovPO = fileLineArr[1];
-					TraceText("NazovPO: " + NazovPO);
-				var DatumVznikuPO = "";
-				var RodneCislo = fileLineArr[3];
-					TraceText("RodneCislo: " + RodneCislo);
-				var titulPredMenom = fileLineArr[4];
-					TraceText("titulPredMenom: " + titulPredMenom);
-				var Meno = fileLineArr[5];
-					TraceText("Meno: " + Meno);
-				var priezvisko = fileLineArr[6];
-					TraceText("priezvisko: " + priezvisko);
-				var titulZa = fileLineArr[7];
-					TraceText("titulZa: " + titulZa);
-				var DatumNarodenia = fileLineArr[8];
-					TraceText("DatumNarodenia: " + DatumNarodenia);
-				var email = fileLineArr[9];
-					TraceText("email: " + email);
+	//typ adresy
+	var typAdresy;
+	if (ulica == '' && pOBOX != '') {
+		typAdresy = 20;
+	} else {
+		typAdresy = 10;
+	}
+	adresaMeth.SetParameterValue(11, "SKCODELISTS@103.510@1.1:TypeEnumTargetType", 0, typAdresy);
+	//adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); //666
+
+	//zavolaj metodu kontroly/pridania adresy
+	objclass.CallMethod(cootx, adresaMeth);
+
+	//precitaj vystup metody (objekt)
+	adresa = adresaMeth.GetParameterValue(1);
+	TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + ";" + druhAdersySusr_CL010139 + " adresa: " + adresa);
+
+}
+
+// adresaGeo
+function adresaGeoInit() {
+	//ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
+	var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddressGEO");
+
+	adresaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRING", 0, ulica);
+	adresaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRING", 0, supisneCislo);
+	adresaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
+	adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, psc);
+	adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, obec);
+	if(okresSusr_0048 != null) {
+	adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, okresSusr_0048);
+	}
+
+	//najdi a nastav stat
+	if(statSusr_CL000086 != null)	{
+		var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassRegItemStat WHERE .SKCODELISTS@103.510:AttrStrCode = " + statSusr_CL000086;
+		var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
+		searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
+		objclass.CallMethod(cootx, searchmeth);
+		var objlist = searchmeth.GetParameter3(2);
+		if(objlist != null) {
+			objlist = objlist.toArray();
+			if(objlist.length > 0) {
+				adresaMeth.SetParameterValue(10, "COOSYSTEM@1.1:OBJECT", 0, objlist[0]);
+			}
+		}
+	}
+
+	//typ adresy 666
+	// var typAdresy;
+	// if (ulica == '' && pOBOX != '') {
+	// 	typAdresy = 20;
+	// } else {
+	// 	typAdresy = 10;
+	// }
+	//adresaMeth.SetParameterValue(11, "SKCODELISTS@103.510@1.1:TypeEnumTargetType", 0, typAdresy);
+	//adresaMeth.SetParameterValue(12, "COOSYSTEM@1.1:BOOLEAN", 0 , true); //666
+
+
+
+	//zavolaj metodu kontroly/pridania adresy
+	objclass.CallMethod(cootx, adresaMeth);
+
+	//precitaj vystup metody (objekt)
+	adresaGeo = adresaMeth.GetParameterValue(1);
+	TraceText("### ADRESA vysledok: " + jrzId + ";" + adresa.GetAddress() + "; druh adr: "  + druhAdersySusr_CL010139 + " adresa: " + adresa);
+
+}
+
+//ActCheckAndAddOsoba
+function vytvorOsobu(adresaIna) {
+
+	var ICO = fileLineArr[0];
+		TraceText("ICO: " + ICO);
+	var NazovPO = fileLineArr[1];
+		TraceText("NazovPO: " + NazovPO);
+	var DatumVznikuPO = "";
+	var RodneCislo = fileLineArr[3];
+		TraceText("RodneCislo: " + RodneCislo);
+	var titulPredMenom = fileLineArr[4];
+		TraceText("titulPredMenom: " + titulPredMenom);
+	var Meno = fileLineArr[5];
+		TraceText("Meno: " + Meno);
+	var priezvisko = fileLineArr[6];
+		TraceText("priezvisko: " + priezvisko);
+	var titulZa = fileLineArr[7];
+		TraceText("titulZa: " + titulZa);
+	var DatumNarodenia = fileLineArr[8];
+		TraceText("DatumNarodenia: " + DatumNarodenia);
+	var email = fileLineArr[9];
+		TraceText("email: " + email);
 
 				var Identifikator = "";
 				if (ICO != "") { Identifikator = ICO; }
@@ -251,14 +157,15 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				if (ICO != "") { TypIdentifikatoru = "7"; }
 				if (RodneCislo != "") { TypIdentifikatoru = "9"; }
 
-				TraceText("_ident_ ");
+				TraceText("Identifikator: ", Identifikator);
+				TraceText("TypIdentifikatoru: ", TypIdentifikatoru);
 
 				var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
 
 				//ICO alebo RC|TypIdentifikatoru|Titul|Meno|Priezvisko|Firma|Email|Adresa|DatumNarodenia|TypAdresy
 				var osobaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddOsoba");
 
-				TraceText("_set parametrov_ ");
+				TraceText("_set parametrov_");
 				osobaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRINGLIST", 0, Identifikator);
 				osobaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRINGLIST", 0, TypIdentifikatoru);
 				osobaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, titulPredMenom);
@@ -273,7 +180,7 @@ while (!inFile.AtEndOfStream) // prvy riadok
 				TraceText("200001 v if ");
 				if(adresa != "") {
 					TraceText("adresa: ", adresa);
-					osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresa); // ADRESA 666
+					osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaIna); // ADRESA 666
 				} else {
 					TraceText("adresa je null");
 				}
@@ -332,13 +239,6 @@ while (!inFile.AtEndOfStream) // prvy riadok
 								       if (osobaIDs!=null) {
 								        var osobaIDsCnt = 0;
 								   			osobaIDs = osobaIDs.toArray();
-
-												//zmazanie ID z druheho riadku 666
-												// TraceText("osobaIDs: ", osobaIDs);
-												// if(osobaIDs[1] != null) {
-												// 	TraceText("_____v if ", osobaIDs[1]);
-												// 	osobaIDs = null;
-												// }
 
 								   			osobaIDsCnt = osobaIDs.length;
 								   			for (var iOsobaIDs = 0; iOsobaIDs<osobaIDsCnt; iOsobaIDs++)
@@ -537,6 +437,117 @@ while (!inFile.AtEndOfStream) // prvy riadok
 
 			//	osoba.SetAttributeValue(cootx, "SKPRECONFIGSK@103.510:objid", 0, jrzId);
 				TraceText("### OSOBA vysledok: " + jrzId + ";" + osoba.GetAddress());
+
+	}
+
+//----------------------MAIN_CODE-----------------------------------------------------
+
+try
+{
+TraceText(scriptName + "  START -->");
+
+//create log file
+var logPath = logDirPath + scriptName + ".txt";
+var fso = new ActiveXObject("Scripting.FileSystemObject");
+var logFile = null;
+if (doLogFile)
+{
+	TraceText(" > VYTVARAM LOGFILE  ");
+  logFile = fso.CreateTextFile(logPath, true);
+}
+
+//nacitanie csv - read file
+TraceText(" >> otvaram csv subor na import ", fso.FileExists(inFile));
+  if (fso.FileExists(inFile)) {
+  var inFile = fso.OpenTextFile(inFile, 1);
+}
+
+TraceText(" >>> nacitavam data... ");
+
+var lineNum = 0;
+
+while (!inFile.AtEndOfStream) // prvy riadok
+{
+  TraceText(" >>>> spracovavam riadok  ", lineNum );
+  lineNum++;
+	var commitovanie = lineNum;
+	//file line upravit na +1 aby nenacital
+  var fileLine = inFile.ReadLine(); // nacitaj riadok
+  TraceText(" fileLine:  ", fileLine );
+
+  try
+  {
+    TraceText(" >>>>> pozeram ci riadok nie je prazdny ");
+    if ( !IsNullOrEmpty(fileLine)) // ak riadok nie je prazdny
+    TraceText(" >>>>>> riadok nie je prazdny ");
+    {
+      var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
+			TraceText(" fileLineArr ", fileLineArr);
+      if (fileLineArr.length>1) // ak daka je
+      {
+
+      // udaje v csv
+			TraceText(" Vypis hodnot z csv ");
+			if (fileLineArr[0] != "") {
+				TraceText("ICO: " + fileLineArr[0]);
+			}
+			if (fileLineArr[1] != "") {
+				TraceText("Osoba PO nazov: " + fileLineArr[1]);
+			}
+			if (fileLineArr[2] != "") {
+				TraceText("RC: " + fileLineArr[3]);
+			}
+			if (fileLineArr[5] != "") {
+				TraceText("meno: " + fileLineArr[5]);
+			}
+			if (fileLineArr[6] != "") {
+				TraceText("priezvysko: " + fileLineArr[6]);
+			}
+			if (fileLineArr[8] != "") {
+				TraceText("datum narodenia: " + fileLineArr[8]);
+			}
+			TraceText(":::::::::::::: ");
+
+
+			var jrzId = fileLineArr[14];
+		 	if (fileLineArr[14] != "") {
+				TraceText("jrzId: " + fileLineArr[14]);
+		 	}
+			var ulica = fileLineArr[16];
+				TraceText("ulica: " + ulica);
+			var obec = fileLineArr[21];
+				TraceText("obec: " + obec);
+			var supisneCislo = fileLineArr[17];
+				TraceText("supisneCislo: " + supisneCislo);
+			var orientacneCislo = fileLineArr[18];
+				TraceText("orientacneCislo: " + orientacneCislo);
+			var pOBOX = fileLineArr[20];
+				TraceText("pOBOX: " + pOBOX);
+			var psc = fileLineArr[19];
+				TraceText("psc: " + psc);
+			var druhAdersySusr_CL010139 = fileLineArr[15];
+				TraceText("druhAdersySusr_CL010139: " + druhAdersySusr_CL010139);
+			var okresSusr_0048 = fileLineArr[22];
+				TraceText("okresSusr_0048: " + fileLineArr[22]);
+			var statSusr_CL000086 = fileLineArr[23];
+				TraceText("statSusr_CL000086: " + fileLineArr[23]);
+
+				var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
+
+				TraceText(" druh adresy ", druhAdersySusr_CL010139);
+				if(druhAdersySusr_CL010139 == "200001") {
+				  TraceText(" druh adresy 200001");
+
+					// sem pridat volanie metody adresa
+					adresaInit();
+
+				} else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+					TraceText(" druh adresy 100001");
+
+					// sem pridat metodu adresaGeo
+					adresaGeoInit();
+				}
+
 
 
             if(lineNum != 1) {
