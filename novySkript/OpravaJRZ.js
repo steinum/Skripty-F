@@ -149,34 +149,39 @@ function vytvorOsobu(adresaIna) {
 	var email = fileLineArr[9];
 		TraceText("email: " + email);
 
-				var Identifikator = "";
-				if (ICO != "") { Identifikator = ICO; }
-				if (RodneCislo != "") { Identifikator = RodneCislo; }
+	var Identifikator = "";
+	if (ICO != "") { Identifikator = ICO; }
+	if (RodneCislo != "") { Identifikator = RodneCislo; }
 
-				var TypIdentifikatoru = "";
-				if (ICO != "") { TypIdentifikatoru = "7"; }
-				if (RodneCislo != "") { TypIdentifikatoru = "9"; }
+	var TypIdentifikatoru = "";
+	if (ICO != "") { TypIdentifikatoru = "7"; }
+	if (RodneCislo != "") { TypIdentifikatoru = "9"; }
 
-				TraceText("Identifikator: ", Identifikator);
-				TraceText("TypIdentifikatoru: ", TypIdentifikatoru);
+		TraceText("Identifikator: ", Identifikator);
+		TraceText("TypIdentifikatoru: ", TypIdentifikatoru);
 
-				var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
+	var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
 
-				//ICO alebo RC|TypIdentifikatoru|Titul|Meno|Priezvisko|Firma|Email|Adresa|DatumNarodenia|TypAdresy
-				var osobaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddOsoba");
+	//ICO alebo RC|TypIdentifikatoru|Titul|Meno|Priezvisko|Firma|Email|Adresa|DatumNarodenia|TypAdresy
+	var osobaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddOsoba");
 
-				TraceText("_set parametrov_");
-				osobaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRINGLIST", 0, Identifikator);
-				osobaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRINGLIST", 0, TypIdentifikatoru);
-				osobaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, titulPredMenom);
-				osobaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, Meno);
-				osobaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, priezvisko);
-				osobaMeth.SetParameterValue(9, "COOSYSTEM@1.1:STRING", 0, NazovPO);
-				osobaMeth.SetParameterValue(11, "COOSYSTEM@1.1:STRING", 0, email);
-				TraceText("_set parametrov koniec_ ");
+	TraceText("_set parametrov_");
+	osobaMeth.SetParameterValue(2, "COOSYSTEM@1.1:STRINGLIST", 0, Identifikator);
+	osobaMeth.SetParameterValue(3, "COOSYSTEM@1.1:STRINGLIST", 0, TypIdentifikatoru);
+	osobaMeth.SetParameterValue(4, "COOSYSTEM@1.1:STRING", 0, titulPredMenom);
+	osobaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, Meno);
+	osobaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, priezvisko);
+	osobaMeth.SetParameterValue(9, "COOSYSTEM@1.1:STRING", 0, NazovPO);
+	osobaMeth.SetParameterValue(11, "COOSYSTEM@1.1:STRING", 0, email);
 
-			TraceText("::::::::::druhAdersySusr_CL010139: ", druhAdersySusr_CL010139);
-			if(druhAdersySusr_CL010139 == "200001") {
+	TraceText("adresaIna: ", adresaIna);
+	if(adresaIna != null) {
+			osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaIna);
+		}
+	}
+
+	TraceText("::::::::::druhAdersySusr_CL010139: ", druhAdersySusr_CL010139);
+	if(druhAdersySusr_CL010139 == "200001") {
 				TraceText("200001 v if ");
 				if(adresa != "") {
 					TraceText("adresa: ", adresa);
