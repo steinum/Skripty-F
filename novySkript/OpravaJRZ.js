@@ -23,6 +23,8 @@ var coouser = coort.GetCurrentUser();
 var adresa;
 var adresaGeo;
 
+var fso;
+
 
 //----------------------FUNCTIONS-------------------------------------
 
@@ -44,7 +46,6 @@ function TraceText(traceStr) {
 // vytvaranie log file
 function vytvorLog() {
   var logPath = logDirPath + scriptName + ".txt";
-  var fso = new ActiveXObject("Scripting.FileSystemObject");
   var logFile = null;
   if (doLogFile) {
     TraceText(" > VYTVARAM LOGFILE  ");
@@ -462,6 +463,8 @@ TraceText("### OSOBA vysledok: " + jrzId + ";" + osoba.GetAddress());
 try {
   TraceText(scriptName + "  START -->");
 
+  fso = new ActiveXObject("Scripting.FileSystemObject");
+
   // vytvor log
   vytvorLog();
 
@@ -477,11 +480,18 @@ try {
 
   while (!inFile.AtEndOfStream) {
     TraceText(" >>>> spracovavam riadok  ", lineNum);
+
+    //nacita riadok okrem hlavicky
+    if (lineNum != 0)
+      var fileLine = inFile.ReadLine(); // nacitaj riadok
+
+    //riadok nacitany inkrementuj hodnotu
     lineNum++;
+
+    //po nacitani urciteho poctu riadkov sa vykonava commit
     var commitovanie = lineNum;
-    //file line upravit na +1 aby nenacital
-    var fileLine = inFile.ReadLine(); // nacitaj riadok
-    TraceText(" fileLine:  ", fileLine);
+
+    TraceText(" fileLine:  " + fileLine + " line number: " + lineNum);
 
     try {
       TraceText(" >>>>> pozeram ci riadok nie je prazdny ");
@@ -489,9 +499,7 @@ try {
         TraceText(" >>>>>> riadok nie je prazdny "); {
         var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
         TraceText(" fileLineArr ", fileLineArr);
-        if (fileLineArr.length > 1) // ak daka je
-        {
-
+        if (fileLineArr.length > 1) { // ak daka je
           // udaje v csv
           TraceText(" Vypis hodnot z csv ");
           if (fileLineArr[0] != "") {
@@ -513,7 +521,6 @@ try {
             TraceText("datum narodenia: " + fileLineArr[8]);
           }
           TraceText(":::::::::::::: ");
-
 
           var jrzId = fileLineArr[14];
           if (fileLineArr[14] != "") {
@@ -554,7 +561,7 @@ try {
             adresaGeoInit();
           }
 
-
+          // 444
 
           if (lineNum != 1) {
 
