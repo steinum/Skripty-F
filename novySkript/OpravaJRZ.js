@@ -8,6 +8,12 @@ Skript opravuje import osob z JRZ
 -Vymazava udaje ak je PO, tak zo zalozky FO a ak je FO, tak zo zalozky PO
 -Vytvori, alebo upravi osobu
 
+ vymaze vsetky adresy z osoby potom vytvori adresu geo a znovu vymaze vsetky TypAdresy
+ a prida adresu geo - treba prerobit aby to pri druhom prechadzani rovnakej
+ osoby nemazalo adresu - kontrolovat ci dany identifikator uz bol
+
+ jrz id nedoplna pozriet kedy sa ma naplnat a preco neinicializovalo
+
 */
 
 //---------------------CONFIGURABLES---------------------------
@@ -142,7 +148,7 @@ function adresaGeoInit() {
 }
 
 //ActCheckAndAddOsoba
-function vytvorOsobu(adresaIna) {
+function vytvorOsobu() {
 
   var ICO = fileLineArr[0];
   TraceText("ICO: " + ICO);
@@ -196,6 +202,26 @@ function vytvorOsobu(adresaIna) {
   osobaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, priezvisko);
   osobaMeth.SetParameterValue(9, "COOSYSTEM@1.1:STRING", 0, NazovPO);
   osobaMeth.SetParameterValue(11, "COOSYSTEM@1.1:STRING", 0, email);
+
+  TraceText(" druh adresy ", druhAdersySusr_CL010139);
+  if (druhAdersySusr_CL010139 == "200001") {
+    TraceText(" druh adresy 200001");
+
+    // sem pridat volanie metody adresa
+    adresaInit();
+    if (adresa != null) {
+      osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresa);
+    }
+
+  } else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    TraceText(" druh adresy 100001");
+
+    // sem pridat metodu adresaGeo
+    adresaGeoInit();
+    if (adresaGeo != null) {
+      osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo);
+    }
+  }
 
   TraceText("adresaIna: ", adresaIna);
   if (adresaIna != null) {
@@ -547,21 +573,8 @@ try {
 
           var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
 
-          TraceText(" druh adresy ", druhAdersySusr_CL010139);
-          if (druhAdersySusr_CL010139 == "200001") {
-            TraceText(" druh adresy 200001");
-
-            // sem pridat volanie metody adresa
-            adresaInit();
-
-          } else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-            TraceText(" druh adresy 100001");
-
-            // sem pridat metodu adresaGeo
-            adresaGeoInit();
-          }
-
           // 444
+          vytvorOsobu();
 
           if (lineNum != 1) {
 
