@@ -29,8 +29,14 @@ var coouser = coort.GetCurrentUser();
 var adresa;
 var adresaGeo;
 
+var vratenaOsoba;
+
+var logFile;
 var fso;
 var commitovanie;
+var fileLine;
+var lineNum;
+var Identifikator;
 
 var ICO;
 var NazovPO;
@@ -51,6 +57,7 @@ var pOBOX;
 var obec;
 var okresSusr_0048;
 var statSusr_CL000086;
+var druhAdersySusr_CL010139;
 
 //osoba z predosleho riadku
 var predosliIdent;
@@ -76,17 +83,22 @@ function TraceText(traceStr) {
 // vytvaranie log file
 function vytvorLog() {
   var logPath = logDirPath + scriptName + ".txt";
-  var logFile = null;
+  logFile = null;
   if (doLogFile) {
+    TraceText(" :::::::::::::::::::: ");
     TraceText(" > VYTVARAM LOGFILE  ");
+    TraceText(" :::::::::::::::::::: ");
     logFile = fso.CreateTextFile(logPath, true);
     if (logFile != null)
-      TraceText(" > LOG FILE VYTVORENY ", logFile);
+      TraceText(" > LOG FILE VYTVORENY ");
+    TraceText(" :::::::::::::::::::: ");
   }
 }
 
 // adresa
 function adresaInit() {
+  TraceText(" :::::::::::::: akcia - adresaInit() ::::::::::::: ");
+
   //ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
   var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddress");
 
@@ -129,11 +141,15 @@ function adresaInit() {
 
   //precitaj vystup metody (objekt)
   adresa = adresaMeth.GetParameterValue(1);
-  TraceText("### ADRESA vysledok: " + jrzId + " adresa COO: " + adresa.GetAddress() + " druh adr: " + druhAdersySusr_CL010139 + " adresa: " + adresa);
-}
+  TraceText("### ADRESA vysledok: " + jrzId + " adresa COO: " + adresa.GetAddress() + " druh adr: " + druhAdersySusr_CL010139);
+
+  TraceText(" :::::::::::::: akcia - adresaInit() - END ::::::::::::: ");
+} //::::::::::::::::::::::::::::::::::: adresaGeoInit - END :::::::::::::::::::::::::::::::::::::
 
 // adresaGeo
 function adresaGeoInit() {
+  TraceText(" ::::::::::::: akcia - adresaGeoInit() :::::::::::::: ");
+
   //ulica|obec|cisloPopisne|cisloOrientacne|POBOX|PSC|stat
   var adresaMeth = objclass.GetMethod(cootx, "SKCODELISTS@103.510:ActCheckAndAddAddressGEO");
 
@@ -168,12 +184,13 @@ function adresaGeoInit() {
 
   //precitaj vystup metody (objekt)
   adresaGeo = adresaMeth.GetParameterValue(1);
-  TraceText("### ADRESA-GEO vysledok: " + jrzId + " adresa COO: " + adresa.GetAddress() + " druh adr: " + druhAdersySusr_CL010139 + " adresa: " + adresa);
+  TraceText("### ADRESA-GEO vysledok: " + jrzId + " adresa COO: " + adresaGeo.GetAddress() + " druh adr: " + druhAdersySusr_CL010139);
+  TraceText(" ::::::::::::: akcia - adresaGeoInit() - END :::::::::::::: ");
 } //::::::::::::::::::::::::::::::::::: adresaGeoInit - END :::::::::::::::::::::::::::::::::::::
 
 //ActCheckAndAddOsoba
 function vytvorOsobu() {
-
+  TraceText(" ::::::::::::: akcia - vytvorOsobu() :::::::::::: ");
 
   if (ICO != "") {
     predosliIdent = ICO;
@@ -183,18 +200,26 @@ function vytvorOsobu() {
   }
 
   //porovnanie identifikatora z predoslim riadkom
+  TraceText(" --- pozeram ci ide o riadok s rovnakym ID  predosliIdent: " + predosliIdent + " Identifikator: " + Identifikator);
   if (predosliIdent == Identifikator) {
     rovnakyID = true;
-    TraceText("Riadky maju rovnake ID: ", rovnakyID);
+    TraceText("Riadky maju rovnake ID: " + rovnakyID);
+  } else {
+    TraceText("Riadky nemaju rovnake ID: " + rovnakyID);
   }
 
-  var Identifikator = "";
+  TraceText("ICO: " + ICO);
+  TraceText("RodneCislo: " + RodneCislo);
+
+  Identifikator = "";
   if (ICO != "") {
     Identifikator = ICO;
   }
   if (RodneCislo != "") {
     Identifikator = RodneCislo;
   }
+
+  TraceText("Identifikator: " + Identifikator);
 
   var TypIdentifikatoru = "";
   if (ICO != "") {
@@ -204,8 +229,7 @@ function vytvorOsobu() {
     TypIdentifikatoru = "9";
   }
 
-  TraceText("Identifikator: ", Identifikator);
-  TraceText("TypIdentifikatoru: ", TypIdentifikatoru);
+  TraceText("TypIdentifikatoru: " + TypIdentifikatoru);
 
   var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
 
@@ -222,26 +246,42 @@ function vytvorOsobu() {
   osobaMeth.SetParameterValue(11, "COOSYSTEM@1.1:STRING", 0, email);
 
   // SET ADRESA
-  TraceText(" druh adresy ", druhAdersySusr_CL010139);
+  TraceText(" druh adresy " + druhAdersySusr_CL010139);
   if (druhAdersySusr_CL010139 == "200001") {
-    TraceText(" druh adresy 200001");
+    TraceText("  200001");
 
     adresaInit();
 
     if (adresa != null) {
       osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresa);
     }
-  } else { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    TraceText(" druh adresy 100001");
+
+  } else if (druhAdersySusr_CL010139 == "100001") { // ::::::::::::::::::::::::::::::::: druh adresy 100001 - geo   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    TraceText("  100001");
 
     adresaGeoInit();
 
     if (adresaGeo != null) {
       osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo);
     }
+  } else if (druhAdersySusr_CL010139 == "100101") {
+    TraceText("  100101");
+
+    adresaGeoInit();
+
+    if (adresaGeo != null) {
+      osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo);
+    }
+  } else {
+    TraceText(" druh adresy INA");
+
+    adresaGeoInit();
+    if (adresaGeo != null) {
+      osobaMeth.SetParameterValue(12, "COOSYSTEM@1.1:OBJECT", 0, adresaGeo);
+    }
   }
 
-  TraceText("datum narodenia ");
+  TraceText("datum narodenia " + datumNarodenia);
   osobaMeth.SetParameterValue(14, "COOSYSTEM@1.1:DATETIME", 0, datumNarodenia);
 
   TraceText("boolean true ");
@@ -265,11 +305,11 @@ function vytvorOsobu() {
         foundObjs = foundObjs.toArray();
         var os = foundObjs[0];
 
-        TraceText("osobaVyhladana: ", osobaVyhladana);
+        TraceText("osobaVyhladana: " + os);
         //var meno = GetAttributeString(cootx, "CONTACTEXT@15.1001:mlname");
         var meno = os.COOSYSTEM_1_1_objname;
 
-        TraceText("vlastnost: ", meno);
+        TraceText("vlastnost: " + meno);
 
         var osobaIDs = os.SKCODELISTS_103_510_AttrAggrIdentifikatory;
         if (osobaIDs != null) {
@@ -283,13 +323,15 @@ function vytvorOsobu() {
             if (typOsoby != null) {
               if (typOsoby == 9) {
 
+                TraceText("::::::::::::::::: pred rovnake ID ::::::::::::::::");
                 if (!rovnakyID) {
+                  TraceText(":::::::::::::::::nema rovnake ID ::::::::::::::::");
 
-                  TraceText("typ osoby FO ");
+                  TraceText(":::::::::::: typ osoby FO :::::::::::::");
                   logFile.WriteLine(" FO");
 
-                  TraceText("Meno fo: ", os.SKCODELISTS_103_510_AttrStrOsobaMeno);
-                  TraceText("Plne meno pravnickej osoby: ", os.SKCODELISTS_103_510_AttrStrPOPlneMeno);
+                  TraceText("Meno fo: " + os.SKCODELISTS_103_510_AttrStrOsobaMeno);
+                  TraceText("Plne meno pravnickej osoby: " + os.SKCODELISTS_103_510_AttrStrPOPlneMeno);
                   if (os.SKCODELISTS_103_510_AttrStrPOPlneMeno != null) {
                     os.SKCODELISTS_103_510_AttrStrPOPlneMeno = null;
                   }
@@ -319,9 +361,9 @@ function vytvorOsobu() {
                   }
                   TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
                   if (os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-                    TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+                    TraceText(" vymazavam adresu " + os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
                     os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-                    TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+                    TraceText(" agregat adresa: " + os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
                   }
 
 
@@ -368,13 +410,6 @@ function vytvorOsobu() {
 
         TraceText("vlastnost: ", meno);
 
-
-        var g = os.SKCODELISTS_103_510_AttrStrPOPlneMeno;
-        var m = os.SKCODELISTS_103_510_AttrStrOsobaMeno;
-
-        TraceText("nazovPO xxx: ", g);
-        TraceText("nazovFO xxx: ", m);
-
         var osobaIDs = os.SKCODELISTS_103_510_AttrAggrIdentifikatory;
         if (osobaIDs != null) {
           var osobaIDsCnt = 0;
@@ -395,8 +430,9 @@ function vytvorOsobu() {
               if (typOsoby == 7) {
 
                 if (!rovnakyID) {
+                  TraceText(":::::::::::::::::nema rovnake ID ::::::::::::::::");
 
-                  TraceText("typ osoby PO ");
+                  TraceText("::::::::::::::::: typ osoby PO ::::::::::::::::");
                   logFile.WriteLine(" PO");
 
                   os.SKCODELISTS_103_510_AttrPtrCisSUSR0062;
@@ -473,201 +509,201 @@ function vytvorOsobu() {
   objclass.CallMethod(cootx, osobaMeth);
 
   //precitaj vystup metody (objekt)
-  var osoba = osobaMeth.GetParameterValue(1);
+  vratenaOsoba = osobaMeth.GetParameterValue(1);
 
   //	osoba.SetAttributeValue(cootx, "SKPRECONFIGSK@103.510:objid", 0, jrzId);
-  TraceText("### OSOBA vysledok: " + jrzId + ";" + osoba.GetAddress());
+  TraceText("### OSOBA vysledok: " + jrzId + ";" + vratenaOsoba.GetAddress());
 
-  //----------------------MAIN_CODE-----------------------------------------------------
+  //return vratenaOsoba;
 
-  try {
-    TraceText(scriptName + "  START -->");
+  TraceText(" ::::::::::::: akcia - vytvorOsobu() - END :::::::::::: ");
+}
 
-    fso = new ActiveXObject("Scripting.FileSystemObject");
+//----------------------MAIN_CODE-----------------------------------------------------
 
-    // vytvor log
-    vytvorLog();
+try {
+  TraceText(scriptName + "  START -->");
 
-    //nacitanie csv - read file
-    TraceText(" >> otvaram csv subor na import ", fso.FileExists(inFile));
-    if (fso.FileExists(inFile)) {
-      var inFile = fso.OpenTextFile(inFile, 1);
-    }
+  fso = new ActiveXObject("Scripting.FileSystemObject");
 
-    TraceText(" >>> nacitavam data... ");
+  // vytvor log
+  vytvorLog();
 
-    var lineNum = 0;
-
-    while (!inFile.AtEndOfStream) {
-      TraceText(" >>>> spracovavam riadok  ", lineNum);
-
-      //nacita riadok okrem hlavicky
-      if (lineNum != 0)
-        var fileLine = inFile.ReadLine(); // nacitaj riadok
-
-      //riadok nacitany inkrementuj hodnotu
-      lineNum++;
-
-      //po nacitani urciteho poctu riadkov sa vykonava commit
-      commitovanie = lineNum;
-
-      TraceText(" fileLine:  " + fileLine + " line number: " + lineNum);
-
-      try {
-        TraceText(" >>>>> pozeram ci riadok nie je prazdny ");
-        if (!IsNullOrEmpty(fileLine)) // ak riadok nie je prazdny
-          TraceText(" >>>>>> riadok nie je prazdny "); {
-          var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
-          TraceText(" fileLineArr ", fileLineArr);
-          if (fileLineArr.length > 1) { // ak daka je
-            // udaje v csv
-            TraceText(" Ukladanie a vypis hodnot z csv ");
-
-            //ICO
-            if (fileLineArr[0] != "") {
-              TraceText("ICO v CSV: " + fileLineArr[0]);
-            }
-            ICO = fileLineArr[0];
-            TraceText("ICO: " + ICO);
-
-            //NAZOV PO
-            if (fileLineArr[1] != "") {
-              TraceText("Osoba PO nazov v CSV: " + fileLineArr[1]);
-            }
-            NazovPO = fileLineArr[1];
-            TraceText("NazovPO: " + NazovPO);
-
-            //DATUM VZNIKU
-            DatumVznikuPO = "";
-
-            //RODNE CISLO
-            if (fileLineArr[3] != "") {
-              TraceText("RC v CSV: " + fileLineArr[3]);
-            }
-            RodneCislo = fileLineArr[3];
-            TraceText("RodneCislo: " + RodneCislo);
-
-            //TITUL
-            titulPredMenom = fileLineArr[4];
-            TraceText("titulPredMenom: " + titulPredMenom);
-
-            //MENO
-            if (fileLineArr[5] != "") {
-              TraceText("meno v CSV: " + fileLineArr[5]);
-            }
-            Meno = fileLineArr[5];
-            TraceText("Meno: " + Meno);
-
-            //PRIEZVISKO
-            if (fileLineArr[6] != "") {
-              TraceText("priezvysko v CSV: " + fileLineArr[6]);
-            }
-            priezvisko = fileLineArr[6];
-            TraceText("priezvisko: " + priezvisko);
-
-            //TITUL ZA MENOM
-            titulZa = fileLineArr[7];
-            TraceText("titulZa: " + titulZa);
-
-            //DATUM NARODENIA
-            if (fileLineArr[8] != "") {
-              TraceText("datum narodenia v CSV: " + fileLineArr[8]);
-            }
-            datumNarodenia = fileLineArr[8];
-            TraceText("datumNarodenia: " + datumNarodenia);
-
-            //EMAIL
-            email = fileLineArr[9];
-            TraceText("email: " + email);
-
-            //JRZID
-            if (fileLineArr[14] != "") {
-              TraceText("jrzId v CSV: " + fileLineArr[14]);
-            }
-            jrzId = fileLineArr[14];
-            TraceText("jrzId: " + jrzId);
-
-            //ULICA
-            if (fileLineArr[16] != "") {
-              TraceText("ulica v CSV: " + fileLineArr[16]);
-            }
-            ulica = fileLineArr[16];
-            TraceText("ulica: " + ulica);
-
-            //SUPISNE CISLO
-            supisneCislo = fileLineArr[17];
-            TraceText("supisneCislo: " + supisneCislo);
-
-            //ORIENTACNE CISLO
-            orientacneCislo = fileLineArr[18];
-            TraceText("orientacneCislo: " + orientacneCislo);
-
-            //PSC
-            if (fileLineArr[19] != "") {
-              TraceText("psc v CSV: " + fileLineArr[19]);
-            }
-            psc = fileLineArr[19];
-            TraceText("psc: " + psc);
-
-            //POBOX
-            pOBOX = fileLineArr[20];
-            TraceText("pOBOX: " + pOBOX);
-
-            //OBEC
-            if (fileLineArr[21] != "") {
-              TraceText("obec v CSV: " + fileLineArr[21]);
-            }
-            obec = fileLineArr[21];
-            TraceText("obec: " + obec);
-
-            //OKRES
-            okresSusr_0048 = fileLineArr[22];
-            TraceText("okresSusr_0048: " + fileLineArr[22]);
-
-            //STAT
-            statSusr_CL000086 = fileLineArr[23];
-            TraceText("statSusr_CL000086: " + fileLineArr[23]);
-
-
-            var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
-
-            // nespracovavam prvy riadok
-            if (lineNum != 1) {
-
-              vytvorOsobu();
-
-              if (fileLineArr[6] == "") {
-                logFile.WriteLine(fileLineArr[1]);
-              } else {
-                logFile.WriteLine(fileLineArr[6]);
-              }
-              logFile.WriteLine(osoba.GetAddress()); // 666
-
-            }
-          }
-        }
-      } catch (e) {
-        //error processing line
-        TraceText(scriptName + " - ERROR - chyba pri spracovani riadka " + lineNum + ": " + e.message);
-        if (doLogFile) {
-          logFile.WriteLine("ERROR - chyba pri spracovani riadka " + lineNum + ": " + e.message);
-        }
-      }
-
-      if (commitovanie > 50) {
-        coouser.FSCVAPP_1_1001_CommitRoot(cootx);
-        TraceText(" -COMMIT- ");
-        commitovanie = 0;
-      }
-
-
-    }
-    inFile.Close();
-    TraceText(" END - koniec skriptu ");
-
-
-
-  } catch (e) {
-    TraceText(scriptName + " - ERROR : " + e.message);
-    throw e;
+  //nacitanie csv - read file
+  TraceText(" >> otvaram csv subor na import ");
+  TraceText(" :::::::::::::::::::: ");
+  if (fso.FileExists(inFile)) {
+    var inFile = fso.OpenTextFile(inFile, 1);
   }
+  TraceText(" >>> nacitavam data... ");
+  TraceText(" :::::::::::::::::::: ");
+
+  lineNum = 0;
+
+  //neprecita hlavicku
+  inFile.SkipLine();
+
+  while (!inFile.AtEndOfStream) {
+    TraceText(" >>>> spracovavam riadok:  " + lineNum);
+
+    //nacita riadok
+    fileLine = inFile.ReadLine(); // nacitaj riadok
+
+    //riadok nacitany inkrementuj hodnotu
+    lineNum++;
+
+    //po nacitani urciteho poctu riadkov sa vykonava commit
+    commitovanie = lineNum;
+
+    TraceText(" fileLine:  " + fileLine + " line number: " + lineNum);
+
+    try {
+      TraceText(" >>>>> pozeram ci riadok nie je prazdny ");
+      if (!IsNullOrEmpty(fileLine)) // ak riadok nie je prazdny
+        TraceText(" >>>>>> riadok nie je prazdny "); {
+        var fileLineArr = fileLine.split(";"); // pozrie po prvu bodkociarku
+
+        if (fileLineArr.length > 1) { // ak daka je
+          // udaje v csv
+          TraceText(" Ukladanie a vypis hodnot z csv ");
+
+          //ICO
+          if (fileLineArr[0] != "") {
+            TraceText("ICO v CSV: " + fileLineArr[0]);
+          }
+          ICO = fileLineArr[0];
+
+          //NAZOV PO
+          if (fileLineArr[1] != "") {
+            TraceText("Osoba PO nazov v CSV: " + fileLineArr[1]);
+          }
+          NazovPO = fileLineArr[1];
+
+          //DATUM VZNIKU
+          DatumVznikuPO = "";
+
+          //RODNE CISLO
+          if (fileLineArr[3] != "") {
+            TraceText("RC v CSV: " + fileLineArr[3]);
+          }
+          RodneCislo = fileLineArr[3];
+
+          //TITUL
+          titulPredMenom = fileLineArr[4];
+          TraceText("titulPredMenom: " + titulPredMenom);
+
+          //MENO
+          if (fileLineArr[5] != "") {
+            TraceText("meno v CSV: " + fileLineArr[5]);
+          }
+          Meno = fileLineArr[5];
+
+          //PRIEZVISKO
+          if (fileLineArr[6] != "") {
+            TraceText("priezvysko v CSV: " + fileLineArr[6]);
+          }
+          priezvisko = fileLineArr[6];
+
+          //TITUL ZA MENOM
+          titulZa = fileLineArr[7];
+          TraceText("titulZa: " + titulZa);
+
+          //DATUM NARODENIA
+          if (fileLineArr[8] != "") {
+            TraceText("datum narodenia v CSV: " + fileLineArr[8]);
+          }
+          datumNarodenia = fileLineArr[8];
+
+          //EMAIL
+          email = fileLineArr[9];
+          TraceText("email: " + email);
+
+          //JRZID
+          if (fileLineArr[14] != "") {
+            TraceText("jrzId v CSV: " + fileLineArr[14]);
+          }
+          jrzId = fileLineArr[14];
+
+          //DRUH ADRESY
+          if (fileLineArr[15] != "") {
+            TraceText("druhAdersySusr_CL010139 v CSV: " + fileLineArr[15]);
+          }
+          druhAdersySusr_CL010139 = fileLineArr[15];
+
+          //ULICA
+          if (fileLineArr[16] != "") {
+            TraceText("ulica v CSV: " + fileLineArr[16]);
+          }
+          ulica = fileLineArr[16];
+
+          //SUPISNE CISLO
+          supisneCislo = fileLineArr[17];
+          TraceText("supisneCislo: " + supisneCislo);
+
+          //ORIENTACNE CISLO
+          orientacneCislo = fileLineArr[18];
+          TraceText("orientacneCislo: " + orientacneCislo);
+
+          //PSC
+          if (fileLineArr[19] != "") {
+            TraceText("psc v CSV: " + fileLineArr[19]);
+          }
+          psc = fileLineArr[19];
+
+          //POBOX
+          pOBOX = fileLineArr[20];
+          TraceText("pOBOX: " + pOBOX);
+
+          //OBEC
+          if (fileLineArr[21] != "") {
+            TraceText("obec v CSV: " + fileLineArr[21]);
+          }
+          obec = fileLineArr[21];
+
+          //OKRES
+          okresSusr_0048 = fileLineArr[22];
+          TraceText("okresSusr_0048: " + fileLineArr[22]);
+
+          //STAT
+          statSusr_CL000086 = fileLineArr[23];
+          TraceText("statSusr_CL000086: " + fileLineArr[23]);
+
+          var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
+
+          vytvorOsobu();
+
+          if (fileLineArr[6] == "") {
+            logFile.WriteLine(fileLineArr[1]);
+          } else {
+            logFile.WriteLine(fileLineArr[6]);
+          }
+          logFile.WriteLine(vratenaOsoba.GetAddress()); // 666
+
+
+        }
+      }
+    } catch (e) {
+      //error processing line
+      TraceText(scriptName + " - ERROR - chyba pri spracovani riadka " + lineNum + ": " + e.message);
+      if (doLogFile) {
+        logFile.WriteLine("ERROR - chyba pri spracovani riadka " + lineNum + ": " + e.message);
+      }
+    }
+
+    if (commitovanie > 50) {
+      coouser.FSCVAPP_1_1001_CommitRoot(cootx);
+      TraceText(" -COMMIT- ");
+      commitovanie = 0;
+    }
+
+
+  }
+  inFile.Close();
+  TraceText(" END - koniec skriptu ");
+
+
+
+} catch (e) {
+  TraceText(scriptName + " - ERROR : " + e.message);
+  throw e;
+}
