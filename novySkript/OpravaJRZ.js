@@ -18,8 +18,8 @@ Skript opravuje import osob z JRZ
 
 //---------------------CONFIGURABLES---------------------------
 var scriptName = "OpravaJRZ";
-var inFile = "D:\\jrz\\import_test.csv"; //   C:\\Program Files\\Import\\Import_adresy_TESTPPA.csv
-var logDirPath = "D:\\jrz\\"; //   C:\\Program Files\\Import\\
+var inFile = "C:\\Program Files\\Import\\pazur.csv"; //              D:\\jrz\\import_test.csv
+var logDirPath = "C:\\Program Files\\Import\\"; //          D:\\jrz\\
 var doLogFile = true; // vytvorenie LOGU
 var doTrace = true; // trace vypis
 
@@ -58,6 +58,7 @@ var obec;
 var okresSusr_0048;
 var statSusr_CL000086;
 var druhAdersySusr_CL010139;
+var posta;
 
 //osoba z predosleho riadku
 var predosliIdent;
@@ -108,6 +109,52 @@ function adresaInit() {
   adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, orientacneCislo);
   adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, pOBOX);
   adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, psc);
+
+  //z psc vybere postu
+  if (psc != null) {
+
+    //parsovanie psc
+    var nerozparsovanePsc = psc;
+    var rozparsovanePSC;
+
+    rozparsovanePSC = nerozparsovanePsc.replace(/\s/g, "");
+    TraceText(" :::::::: rozparsovane PSC: " + rozparsovanePSC);
+
+    var foundObjs;
+
+    var pscQuery = "SELECT COOSYSTEM@1.1:objname FROM SKCODELISTS@103.510:ObjClassRegItemPSC WHERE .SKCODELISTS@103.510:AttrStrCode = \"" + rozparsovanePSC + "\"";
+    var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
+    searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, pscQuery);
+    objclass.CallMethod(cootx, searchmeth);
+    var objlist = searchmeth.GetParameter3(2);
+    if (objlist != null) {
+      objlist = objlist.toArray();
+      if (objlist.length > 0) {
+        TraceText(" psc: " + objlist[0]);
+        foundObjs = objlist[0];
+      }
+    }
+    TraceText(" psc: " + foundObjs);
+
+    if (foundObjs == null || foundObjs.length < 1) {
+      TraceText(scriptName + " - ziadne (dalsie) objekty na spracovanie");
+    } else {
+      TraceText(" psc: " + foundObjs);
+      posta = foundObjs.SKCODELISTS_103_510_AttrPtrPosta;
+      TraceText(" ---------- posta: " + posta + " ----------- ");
+
+      if (posta != null && posta != "") {
+        adresaMeth.SetParameterValue(8, "COOSYSTEM@1.1:STRING", 0, posta);
+        TraceText(" ---------- naplnilo postu -----------");
+      }
+    }
+  }
+
+
+
+
+
+  TraceText(" obec: " + obec);
 
   //najdi a nastav stat
   if (statSusr_CL000086 != null) {
@@ -162,6 +209,8 @@ function adresaGeoInit() {
     adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, okresSusr_0048);
   }
 
+  TraceText(" obec: " + obec);
+
   //najdi a nastav stat
   if (statSusr_CL000086 != null) {
     var query = "SELECT objname FROM SKCODELISTS@103.510:ObjClassRegItemStat WHERE .SKCODELISTS@103.510:AttrStrCode = " + statSusr_CL000086;
@@ -201,6 +250,10 @@ function vytvorOsobu() {
 
   //porovnanie identifikatora z predoslim riadkom
   TraceText(" --- pozeram ci ide o riadok s rovnakym ID  predosliIdent: " + predosliIdent + " Identifikator: " + Identifikator);
+  TraceText(". ");
+  TraceText(". ");
+  TraceText(". ");
+
   if (predosliIdent == Identifikator) {
     rovnakyID = true;
     TraceText("Riadky maju rovnake ID: " + rovnakyID);
@@ -359,11 +412,11 @@ function vytvorOsobu() {
                   if (os.SKCODELISTS_103_510_AttrAggrContactPersons != null) {
                     os.SKCODELISTS_103_510_AttrAggrContactPersons = null;
                   }
-                  TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
                   if (os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-                    TraceText(" vymazavam adresu " + os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-                    os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-                    TraceText(" agregat adresa: " + os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+                    TraceText(" . ");
+                    TraceText(" .. ");
+                    TraceText(" ... ");
+                    os.SetAttribute(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", null);
                   }
 
 
@@ -445,7 +498,6 @@ function vytvorOsobu() {
                   if (os.ELISTS_103_510_AttrStrOsobaPriezvisko != null) {
                     os.ELISTS_103_510_AttrStrOsobaPriezvisko = null;
                   }
-
                   if (os.SKCODELISTS_103_510_AttrStrOsobaRodnePriezvisko != null) {
                     os.SKCODELISTS_103_510_AttrStrOsobaRodnePriezvisko = null;
                   }
@@ -477,11 +529,11 @@ function vytvorOsobu() {
                     TraceText("vymaz adresu ");
                     os.SKCODELISTS_103_510_AttrPtrCisSUSR5598 = null;
                   }
-                  TraceText(" os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
                   if (os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka != null) {
-                    TraceText(" vymazavam adresu ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
-                    os.SetAttributeValue(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", 0, null);
-                    TraceText(" agregat adresa: ", os.SKCODELISTS_103_510_AttrAggrAdresaFyzicka);
+                    TraceText(" . ");
+                    TraceText(" .. ");
+                    TraceText(" ... ");
+                    os.SetAttribute(cootx, "SKCODELISTS@103.510:AttrAggrAdresaFyzicka", null);
                   }
 
                   TraceText(" PO ok");
@@ -544,7 +596,6 @@ try {
   inFile.SkipLine();
 
   while (!inFile.AtEndOfStream) {
-    TraceText(" >>>> spracovavam riadok:  " + lineNum);
 
     //nacita riadok
     fileLine = inFile.ReadLine(); // nacitaj riadok
@@ -555,7 +606,7 @@ try {
     //po nacitani urciteho poctu riadkov sa vykonava commit
     commitovanie = lineNum;
 
-    TraceText(" fileLine:  " + fileLine + " line number: " + lineNum);
+    TraceText(" >>>> spracovavam riadok: " + fileLine + "    line number: " + lineNum);
 
     try {
       TraceText(" >>>>> pozeram ci riadok nie je prazdny ");
@@ -671,6 +722,10 @@ try {
           var objclass = coort.GetObjectClass("COOSYSTEM@1.1:Object");
 
           vytvorOsobu();
+
+          //prirad jrzId
+          vratenaOsoba.SKPRECONFIGSK_103_510_objid = jrzId;
+          TraceText("jrz: " + vratenaOsoba.SKPRECONFIGSK_103_510_objid);
 
           if (fileLineArr[6] == "") {
             logFile.WriteLine(fileLineArr[1]);
