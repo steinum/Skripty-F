@@ -191,7 +191,7 @@ function adresaInit() {
   TraceText("### ADRESA vysledok: " + jrzId + " adresa COO: " + adresa.GetAddress() + " druh adr: " + druhAdersySusr_CL010139);
 
   TraceText(" :::::::::::::: akcia - adresaInit() - END ::::::::::::: ");
-} //::::::::::::::::::::::::::::::::::: adresaGeoInit - END :::::::::::::::::::::::::::::::::::::
+} //::::::::::::::::::::::::::::::::::: adresaInit - END :::::::::::::::::::::::::::::::::::::
 
 // adresaGeo
 function adresaGeoInit() {
@@ -206,7 +206,28 @@ function adresaGeoInit() {
   adresaMeth.SetParameterValue(5, "COOSYSTEM@1.1:STRING", 0, psc);
   adresaMeth.SetParameterValue(6, "COOSYSTEM@1.1:STRING", 0, obec);
   if (okresSusr_0048 != null) {
-    adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, okresSusr_0048);
+
+    var query = "SELECT COOSYSTEM@1.1:objname FROM SKCODELISTS@103.510:ObjClassCodeListItem";
+    query += " WHERE .SKCODELISTS@103.510:AttrStrCodeListNumber = \"0048\" AND .SKCODELISTS@103.510:AttrStrCode = \"" + okresSusr_0048 + "\"";
+
+    var searchmeth = objclass.GetMethod(cootx, "FSCAREXT@1.1001:ExecuteQuery");
+    searchmeth.SetParameterValue(1, "COOSYSTEM@1.1:STRING", 0, query);
+    objclass.CallMethod(cootx, searchmeth);
+    var objlist = searchmeth.GetParameter3(2);
+
+    if (objlist != null) {
+      objlist = objlist.toArray();
+      if (objlist.length > 0) {
+        TraceText("okresVyhladany: " + objlist[0]);
+        var okresAddr = objlist[0].SKCODELISTS_103_510_AttrStrTitleShortSK;
+        TraceText("okresAddr: " + okresAddr);
+        if (okresAddr != null) {
+          adresaMeth.SetParameterValue(7, "COOSYSTEM@1.1:STRING", 0, okresAddr);
+        } else {
+          TraceText(" okresAddr je null ");
+        }
+      }
+    }
   }
 
   TraceText(" obec: " + obec);
